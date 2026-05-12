@@ -2480,10 +2480,11 @@ function renderRutinas() {
             : (r.sugerida ? '<div class="rutina-badge badge-sugerida">✨ Sugerida</div>' : '<div class="rutina-badge badge-mia">⭐ Mía</div>');
         return '<div class="rutina-card ' + (bloqueada ? 'bloqueada' : '') + '" onclick="' + (bloqueada ? 'alertaBloqueada(' + r.nivelRequerido + ')' : "verRutina('" + r.id + "')") + '">' +
             badge +
-            '<div class="rutina-emoji">' + r.emoji + '</div>' +
+            (CATEGORIA_ICONS[r.categoria]
+                ? '<img src="' + CATEGORIA_ICONS[r.categoria] + '" style="width:58px;height:58px;object-fit:cover;border-radius:14px;filter:drop-shadow(0 0 8px #00f0ff88);margin-bottom:8px;" onerror="this.outerHTML=\'<div class=&quot;rutina-emoji&quot;>' + r.emoji + '</div>\'">'
+                : '<div class="rutina-emoji">' + r.emoji + '</div>') +
             '<div class="rutina-nombre">' + r.nombre + '</div>' +
             '<div class="rutina-info">' +
-                (CATEGORIA_ICONS[r.categoria] ? '<img src="' + CATEGORIA_ICONS[r.categoria] + '" style="width:16px;height:16px;object-fit:cover;border-radius:4px;filter:drop-shadow(0 0 3px #00f0ff);flex-shrink:0;" onerror="this.style.display=\'none\'">' : '') +
                 '<span style="color:var(--cyan);font-size:9px;font-weight:700;">' + r.categoria + '</span>' +
             '</div>' +
             '<div class="rutina-info" style="margin-top:4px;">' +
