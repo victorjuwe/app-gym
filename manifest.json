@@ -1,0 +1,22 @@
+{
+  "name": "La Bichota GYM",
+  "short_name": "La Bichota",
+  "description": "Tu entrenadora personal, mor 👑",
+  "start_url": "/app-gym/",
+  "display": "standalone",
+  "background_color": "#0a0a14",
+  "theme_color": "#00f0ff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icons/favicon.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "assets/icons/favicon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
