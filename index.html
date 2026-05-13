@@ -1529,6 +1529,30 @@ select.input {
 .peso-sparkline-wrap { margin-bottom:8px; }
 /* === DISCOS MODAL === */
 .disco-badge { background:linear-gradient(135deg,rgba(0,240,255,0.1),rgba(255,0,110,0.1)); border:1px solid rgba(0,240,255,0.2); border-radius:10px; padding:8px 14px; text-align:center; }
+/* === SERIE FLASH (completada) === */
+@keyframes serieFlash { 0%{background:rgba(0,240,255,0.25);box-shadow:0 0 12px rgba(0,240,255,0.4);} 100%{background:rgba(0,240,255,0.08);box-shadow:none;} }
+.serie-fila.completada { animation:serieFlash 0.5s ease-out forwards; }
+/* === PR ALERT === */
+.pr-alert-badge { display:inline-flex; align-items:center; gap:5px; background:linear-gradient(135deg,rgba(255,190,11,0.15),rgba(255,0,110,0.1)); border:1px solid rgba(255,190,11,0.4); border-radius:8px; padding:5px 10px; font-size:11px; font-weight:800; color:#ffbe0b; margin-top:6px; animation:prPulse 1.5s ease-in-out infinite; }
+@keyframes prPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,190,11,0.3);} 50%{box-shadow:0 0 0 4px rgba(255,190,11,0.1);} }
+/* === CALENTAMIENTO === */
+.wu-toggle { display:flex; align-items:center; gap:5px; font-size:10px; color:var(--text-gray); font-weight:700; padding:3px 7px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); background:transparent; cursor:pointer; transition:all 0.2s; }
+.wu-toggle.activo { color:#ff9500; border-color:#ff9500; background:rgba(255,149,0,0.1); }
+.wu-tag { font-size:9px; font-weight:800; color:#ff9500; background:rgba(255,149,0,0.15); border-radius:4px; padding:1px 5px; letter-spacing:0.5px; }
+/* === AGUA === */
+.agua-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:10px 0; }
+.agua-btn { background:rgba(0,240,255,0.08); border:1px solid rgba(0,240,255,0.2); color:var(--cyan); border-radius:10px; padding:10px 4px; font-size:12px; font-weight:800; cursor:pointer; text-align:center; transition:all 0.15s; }
+.agua-btn:active { transform:scale(0.95); background:rgba(0,240,255,0.2); }
+.agua-barra-wrap { background:rgba(255,255,255,0.05); border-radius:8px; height:8px; overflow:hidden; margin:8px 0; }
+.agua-barra-fill { height:100%; background:linear-gradient(90deg,var(--cyan),#0099ff); border-radius:8px; transition:width 0.4s ease; box-shadow:0 0 8px rgba(0,240,255,0.4); }
+/* === MAPA MUSCULAR === */
+.musculo-badge { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:8px; font-size:11px; font-weight:800; margin:3px; }
+.musculo-activo { background:rgba(0,240,255,0.12); border:1px solid rgba(0,240,255,0.3); color:var(--cyan); }
+.musculo-descansando { background:rgba(255,0,110,0.06); border:1px solid rgba(255,0,110,0.15); color:rgba(255,100,150,0.7); }
+.musculo-hoy { background:rgba(255,190,11,0.12); border:1px solid rgba(255,190,11,0.35); color:#ffbe0b; }
+/* === NOTA SESIÓN === */
+.nota-input { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#e0e0ff; border-radius:10px; padding:10px; font-size:13px; width:100%; resize:none; font-family:inherit; margin-top:10px; transition:border-color 0.2s; }
+.nota-input:focus { outline:none; border-color:rgba(0,240,255,0.4); }
 </style>
 </head>
 <body>
@@ -1723,6 +1747,11 @@ select.input {
             <div id="calendario-mes" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;"></div>
         </div>
 
+        <div class="card" style="padding:14px 16px;">
+            <div style="font-size:10px;color:var(--magenta);text-transform:uppercase;letter-spacing:1px;font-weight:800;margin-bottom:10px;">💪 Músculos esta semana</div>
+            <div id="mapa-muscular"></div>
+        </div>
+
         <h2 class="section-title">⭐ Récords personales</h2>
         <div id="prs-container"></div>
 
@@ -1756,6 +1785,15 @@ select.input {
             </div>
         </div>
         <div id="nutricion-panel" style="display:none;"></div>
+
+        <div class="coach-card" onclick="toggleAgua()">
+            <div class="coach-card-emoji">💧</div>
+            <div class="coach-card-info">
+                <div class="coach-card-titulo">Hidratación de hoy</div>
+                <div class="coach-card-desc" id="agua-summary">Toca para registrar agua</div>
+            </div>
+        </div>
+        <div id="agua-panel" style="display:none;"></div>
 
         <div class="coach-card" onclick="coachResponder('rutina')">
             <div class="coach-card-emoji">💪</div>
@@ -2370,14 +2408,35 @@ const RUTINAS_SUGERIDAS = [
 
 // ============ LOGROS ============
 const LOGROS = [
-    { id: 'inicio', nombre: 'Primer Paso', emoji: '🌟', desc: 'Completa 1 sesión', condicion: s => s.totalEntrenamientos >= 1 },
-    { id: 'guerrera', nombre: 'Guerrera', emoji: '⚔️', desc: '5 sesiones completadas', condicion: s => s.totalEntrenamientos >= 5 },
-    { id: 'creadora', nombre: 'Creadora', emoji: '✨', desc: 'Crea tu primera rutina', condicion: s => s.rutinas.some(r => !r.sugerida) },
-    { id: 'volumen1000', nombre: 'Pesada', emoji: '🏋️‍♀️', desc: 'Levanta 1.000 kg en total', condicion: s => s.totalVolumen >= 1000 },
-    { id: 'racha7', nombre: 'Constante', emoji: '🔥', desc: '7 días de racha', condicion: s => s.racha >= 7 },
-    { id: 'nivel5', nombre: 'Subiendo', emoji: '⬆️', desc: 'Llega a nivel 5', condicion: s => s.nivel >= 5 },
-    { id: 'bichota', nombre: 'La Bichota', emoji: '👑', desc: 'Llega a nivel 10', condicion: s => s.nivel >= 10 },
-    { id: 'volumen10k', nombre: 'Máquina', emoji: '🤖', desc: 'Levanta 10.000 kg', condicion: s => s.totalVolumen >= 10000 }
+    // Sesiones
+    { id: 'inicio',     nombre: 'Primer Paso',    emoji: '🌟', desc: 'Completa tu primera sesión',       condicion: s => s.totalEntrenamientos >= 1 },
+    { id: 'guerrera',   nombre: 'Guerrera',        emoji: '⚔️', desc: '5 sesiones completadas',           condicion: s => s.totalEntrenamientos >= 5 },
+    { id: 'decidida',   nombre: 'Decidida',        emoji: '💥', desc: '10 sesiones completadas',          condicion: s => s.totalEntrenamientos >= 10 },
+    { id: 'atleta',     nombre: 'Atleta',          emoji: '🏅', desc: '25 sesiones completadas',          condicion: s => s.totalEntrenamientos >= 25 },
+    { id: 'campeona',   nombre: 'Campeona',        emoji: '🏆', desc: '50 sesiones completadas',          condicion: s => s.totalEntrenamientos >= 50 },
+    { id: 'leyenda',    nombre: 'Leyenda',         emoji: '💎', desc: '100 sesiones completadas',         condicion: s => s.totalEntrenamientos >= 100 },
+    // Rachas
+    { id: 'racha3',     nombre: 'En Racha',        emoji: '🔥', desc: '3 días seguidos',                  condicion: s => s.mejorRacha >= 3 },
+    { id: 'racha7',     nombre: 'Constante',       emoji: '🌊', desc: '7 días de racha',                  condicion: s => s.mejorRacha >= 7 },
+    { id: 'racha14',    nombre: 'Imparable',       emoji: '⚡', desc: '14 días de racha',                 condicion: s => s.mejorRacha >= 14 },
+    { id: 'racha30',    nombre: 'Mente de Hierro', emoji: '🧠', desc: '30 días de racha',                 condicion: s => s.mejorRacha >= 30 },
+    // Volumen
+    { id: 'vol500',     nombre: 'Calentando',      emoji: '🌡️', desc: 'Levanta 500 kg en total',          condicion: s => s.totalVolumen >= 500 },
+    { id: 'volumen1000',nombre: 'Pesada',          emoji: '🏋️‍♀️', desc: 'Levanta 1.000 kg en total',      condicion: s => s.totalVolumen >= 1000 },
+    { id: 'vol5k',      nombre: 'Fuerza Bruta',   emoji: '💪', desc: 'Levanta 5.000 kg en total',        condicion: s => s.totalVolumen >= 5000 },
+    { id: 'volumen10k', nombre: 'Máquina',         emoji: '🤖', desc: 'Levanta 10.000 kg en total',       condicion: s => s.totalVolumen >= 10000 },
+    { id: 'vol50k',     nombre: 'Bestia',          emoji: '🦾', desc: 'Levanta 50.000 kg en total',       condicion: s => s.totalVolumen >= 50000 },
+    // Niveles
+    { id: 'nivel3',     nombre: 'Aprendiz Pro',   emoji: '📈', desc: 'Alcanza el nivel 3',               condicion: s => s.nivel >= 3 },
+    { id: 'nivel5',     nombre: 'Subiendo',        emoji: '⬆️', desc: 'Llega a nivel 5',                 condicion: s => s.nivel >= 5 },
+    { id: 'nivel10',    nombre: 'La Bichota',      emoji: '👑', desc: 'Llega a nivel 10',                condicion: s => s.nivel >= 10 },
+    { id: 'nivel15',    nombre: 'Suprema',         emoji: '🌠', desc: 'Llega a nivel 15',                condicion: s => s.nivel >= 15 },
+    // Especiales
+    { id: 'creadora',   nombre: 'Creadora',        emoji: '✨', desc: 'Crea tu primera rutina propia',    condicion: s => s.rutinas.some(r => !r.sugerida) },
+    { id: 'madrugadora',nombre: 'Madrugadora',     emoji: '🌅', desc: 'Entrena antes de las 8h',          condicion: s => s.historial.some(h => new Date(h.fecha).getHours() < 8) },
+    { id: 'nocturna',   nombre: 'Nocturna',        emoji: '🌙', desc: 'Entrena después de las 21h',       condicion: s => s.historial.some(h => new Date(h.fecha).getHours() >= 21) },
+    { id: 'rapida',     nombre: 'Flash',           emoji: '⚡', desc: 'Completa un entreno en < 30 min',  condicion: s => s.historial.some(h => h.duracion < 30 && h.duracion > 0) },
+    { id: 'maraton',    nombre: 'Maratón',         emoji: '⏰', desc: 'Entrena más de 90 minutos',        condicion: s => s.historial.some(h => h.duracion >= 90) },
 ];
 
 function getTitulo(nivel) {
@@ -2405,10 +2464,12 @@ let state = {
     rutinas: [],
     historicoEjercicios: {},
     pesosCorporales: [],
-    perfil: { peso: 0, altura: 0, objetivo: '', diasSemana: 4 },
+    aguaHoy: { fecha: '', ml: 0 },
+    perfil: { peso: 0, altura: 0, objetivo: '', diasSemana: 4, aguaMeta: 2000 },
     nutricion: { objetivo: { calorias: 1800, proteinas: 120 }, diaActual: '', alimentos: [] },
     uid: null, emailGoogle: '',
-    tutorialVisto: false
+    tutorialVisto: false,
+    historialLimit: 5
 };
 
 let db, auth;
@@ -2419,6 +2480,8 @@ let editandoRutina = null;
 let emojiSeleccionado = '🍑';
 let ejercicioTemporal = null;
 let feedbackFatiga = null;
+let feedbackNota = '';
+let esCalentamiento = false;
 
 // ============ STORAGE ============
 function cargarDatos() {
@@ -2428,8 +2491,11 @@ function cargarDatos() {
             state = { ...state, ...JSON.parse(datos) };
             if (!state.historicoEjercicios) state.historicoEjercicios = {};
             if (!state.pesosCorporales) state.pesosCorporales = [];
+            if (!state.aguaHoy) state.aguaHoy = { fecha: '', ml: 0 };
+            if (!state.historialLimit) state.historialLimit = 5;
             if (!state.nutricion) state.nutricion = { objetivo: { calorias: 1800, proteinas: 120 }, diaActual: '', alimentos: [] };
-            if (!state.perfil) state.perfil = { peso: 0, altura: 0, objetivo: '', diasSemana: 4 };
+            if (!state.perfil) state.perfil = { peso: 0, altura: 0, objetivo: '', diasSemana: 4, aguaMeta: 2000 };
+            if (!state.perfil.aguaMeta) state.perfil.aguaMeta = 2000;
             if (state.tutorialVisto === undefined) state.tutorialVisto = false;
             if (state.rutinas) {
                 state.rutinas.forEach(r => {
@@ -3168,7 +3234,7 @@ function renderFilaSerie(idx, ej, esTimer, pesoSugerido, repsSugerido) {
     if (idx < completadas.length) {
         const s = completadas[idx];
         return '<div class="serie-fila completada" onclick="editarSerieCompletada(' + idx + ')">' +
-            '<div class="serie-num">' + numSerie + '</div>' +
+            '<div class="serie-num">' + numSerie + (s.calentamiento ? '<br><span class="wu-tag">WU</span>' : '') + '</div>' +
             '<div class="serie-celda">' + (esTimer ? '—' : s.peso + ' kg') + '</div>' +
             '<div class="serie-celda">' + s.reps + (esTimer ? 's' : '') + '</div>' +
             '<div style="text-align:center; font-size:18px;">✓</div>' +
@@ -3178,15 +3244,20 @@ function renderFilaSerie(idx, ej, esTimer, pesoSugerido, repsSugerido) {
     if (idx === completadas.length) {
         const pesoVal = esTimer ? 0 : (pesoSugerido || '');
         const repsVal = repsSugerido || ej.reps;
+        const wuActivo = esCalentamiento ? ' activo' : '';
         return '<div class="serie-fila actual">' +
             '<div class="serie-num">' + numSerie + '</div>' +
             '<div class="serie-controles-peso">' +
                 '<button type="button" class="btn-peso-mini" onclick="ajustarPeso(-2.5)" ' + (esTimer ? 'disabled' : '') + '>−</button>' +
-                '<input type="number" inputmode="decimal" step="0.5" class="serie-input" id="input-peso" value="' + pesoVal + '" placeholder="0" ' + (esTimer ? 'disabled' : '') + '>' +
+                '<input type="number" inputmode="decimal" step="0.5" class="serie-input" id="input-peso" value="' + pesoVal + '" placeholder="0" ' + (esTimer ? 'disabled' : '') + ' oninput="checkPRAlert(this.value,\'' + ej.nombre.replace(/'/g,"\\'") + '\')">' +
                 '<button type="button" class="btn-peso-mini" onclick="ajustarPeso(2.5)" ' + (esTimer ? 'disabled' : '') + '>+</button>' +
             '</div>' +
             '<input type="number" inputmode="numeric" class="serie-input" id="input-reps" value="' + repsVal + '" placeholder="0">' +
             '<button class="serie-check" onclick="completarSerie()">✓</button>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;padding:4px 2px 0;">' +
+            '<button class="wu-toggle' + wuActivo + '" onclick="toggleCalentamiento()" id="wu-btn">🔥 Calentamiento</button>' +
+            '<div id="pr-alert-zona"></div>' +
         '</div>';
     }
 
@@ -3399,18 +3470,25 @@ function editarSerieCompletada(idx) {
 function completarSerie() {
     const { rutina, ejercicioIdx, serieActual, seriesCompletadas } = entrenamientoActual;
     const ej = rutina.ejercicios[ejercicioIdx];
-    
+
     const peso = parseFloat(document.getElementById('input-peso').value) || 0;
     const reps = parseInt(document.getElementById('input-reps').value) || 0;
-    
+
     if (reps === 0) {
         mostrarToast('¡Anota las reps, mor!');
         return;
     }
-    
-    seriesCompletadas[ejercicioIdx].push({ peso, reps });
-    entrenamientoActual.volumenTotal += (peso * reps);
-    
+
+    // Vibración + flash visual
+    if (navigator.vibrate) navigator.vibrate(esCalentamiento ? 20 : 40);
+    TacticalAudio.beep(esCalentamiento ? 600 : 900, 'sine', 0.06, 0.08);
+
+    const nuevaSerie = { peso, reps };
+    if (esCalentamiento) nuevaSerie.calentamiento = true;
+    seriesCompletadas[ejercicioIdx].push(nuevaSerie);
+    if (!esCalentamiento) entrenamientoActual.volumenTotal += (peso * reps);
+    esCalentamiento = false;
+
     mostrarToast(fraseAleatoria(FRASES_SERIE_COMPLETADA));
     
     if (serieActual < ej.series) {
@@ -3568,6 +3646,10 @@ function mostrarFeedbackFatiga() {
                 '</div>' +
                 '<button class="btn btn-cyan" onclick="confirmarFinalizacion()" id="btn-final-confirmar" disabled style="opacity:0.35;width:100%;padding:15px;font-weight:900;letter-spacing:1px;font-size:14px;">CONFIRMAR Y FINALIZAR</button>' +
             '</div>' +
+            '<div style="margin-top:12px;">' +
+                '<div style="font-size:10px;color:var(--text-gray);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:6px;">📝 Nota (opcional)</div>' +
+                '<textarea class="nota-input" id="nota-sesion" rows="2" placeholder="¿Algo que recordar? Subir peso próxima vez, rodilla molestaba..." oninput="feedbackNota=this.value"></textarea>' +
+            '</div>' +
         '</div>';
 }
 
@@ -3620,8 +3702,11 @@ function confirmarFinalizacion() {
             volumen: volumenTotal,
             xp: rutina.xp,
             fatiga: feedbackFatiga,
+            nota: feedbackNota || '',
             series: seriesCompletadas
         });
+        feedbackNota = '';
+        esCalentamiento = false;
 
         if (state.historial.length > 50) state.historial.shift();
 
@@ -4041,55 +4126,74 @@ function renderProgreso() {
 
     renderGrafica();
     renderCalendario();
+    renderMapaMuscular();
     renderPRs();
 
-    // Historial reciente expandible
-    const recientes = [...state.historial].reverse().slice(0, 5);
+    // Historial reciente expandible con "Ver más"
+    renderHistorial();
+}
+
+function renderHistorial() {
+    const limit = state.historialLimit || 5;
+    const todos = [...state.historial].reverse();
+    const recientes = todos.slice(0, limit);
     const histContainer = document.getElementById('historial-reciente');
+    if (!histContainer) return;
     if (recientes.length === 0) {
         histContainer.innerHTML = '<div style="text-align:center; color:var(--gray); padding:20px; font-size:13px;">Aún no has entrenado. ¡Vamos a darle!</div>';
-    } else {
-        histContainer.innerHTML = recientes.map((h, i) => {
-            const rutH = state.rutinas ? state.rutinas.find(r => r.id === h.rutinaId) : null;
-            let detalleHTML = '';
-            if (rutH && h.series && Array.isArray(h.series)) {
-                detalleHTML = rutH.ejercicios.map((ej, ejIdx) => {
-                    const seriesEj = h.series[ejIdx];
-                    if (!seriesEj || seriesEj.length === 0) return '';
-                    const resumen = seriesEj.map(s => s.peso + 'kg×' + s.reps).join(' / ');
-                    return '<div class="hist-ejercicio-row">' +
-                        '<span class="hist-ejercicio-nombre">' + escapeHTML(ej.nombre) + '</span>' +
+        return;
+    }
+    const items = recientes.map((h, i) => {
+        const rutH = state.rutinas ? state.rutinas.find(r => r.id === h.rutinaId) : null;
+        let detalleHTML = '';
+        if (rutH && h.series && Array.isArray(h.series)) {
+            detalleHTML = rutH.ejercicios.map((ej, ejIdx) => {
+                const seriesEj = h.series[ejIdx];
+                if (!seriesEj || seriesEj.length === 0) return '';
+                const normales = seriesEj.filter(s => !s.calentamiento);
+                const wu = seriesEj.filter(s => s.calentamiento);
+                const resumen = normales.map(s => s.peso + 'kg×' + s.reps).join(' / ');
+                const wuText = wu.length > 0 ? ' <span style="color:#ff9500;font-size:9px;">+' + wu.length + ' WU</span>' : '';
+                return resumen ? '<div class="hist-ejercicio-row">' +
+                    '<span class="hist-ejercicio-nombre">' + escapeHTML(ej.nombre) + '</span>' +
+                    '<span class="hist-ejercicio-series">' + resumen + wuText + '</span>' +
+                '</div>' : '';
+            }).filter(Boolean).join('');
+        }
+        if (!detalleHTML) {
+            Object.entries(state.historicoEjercicios).forEach(([nombre, sesiones]) => {
+                const match = sesiones.find(s => Math.abs(s.fecha - h.fecha) < 3600000);
+                if (match && match.series && match.series.length > 0) {
+                    const resumen = match.series.filter(s => !s.calentamiento).map(s => s.peso + 'kg×' + s.reps).join(' / ');
+                    if (resumen) detalleHTML += '<div class="hist-ejercicio-row">' +
+                        '<span class="hist-ejercicio-nombre">' + escapeHTML(nombre) + '</span>' +
                         '<span class="hist-ejercicio-series">' + resumen + '</span>' +
                     '</div>';
-                }).filter(Boolean).join('');
-            }
-            if (!detalleHTML) {
-                Object.entries(state.historicoEjercicios).forEach(([nombre, sesiones]) => {
-                    const match = sesiones.find(s => Math.abs(s.fecha - h.fecha) < 3600000);
-                    if (match && match.series && match.series.length > 0) {
-                        const resumen = match.series.map(s => s.peso + 'kg×' + s.reps).join(' / ');
-                        detalleHTML += '<div class="hist-ejercicio-row">' +
-                            '<span class="hist-ejercicio-nombre">' + escapeHTML(nombre) + '</span>' +
-                            '<span class="hist-ejercicio-series">' + resumen + '</span>' +
-                        '</div>';
-                    }
-                });
-            }
-            const tieneDetalle = detalleHTML.length > 0;
-            return '<div class="hist-item" data-idx="' + i + '"' + (tieneDetalle ? ' onclick="toggleHistItem(' + i + ')"' : '') + '>' +
-                '<div class="hist-item-header">' +
-                    '<div style="font-size:24px;">' + (h.rutinaEmoji || '💪') + '</div>' +
-                    '<div style="flex:1;">' +
-                        '<div style="font-weight:700; font-size:13px;">' + escapeHTML(h.rutinaNombre) + '</div>' +
-                        '<div style="font-size:11px; color:var(--text-gray);">' + tiempoRelativo(h.fecha) + ' · ' + h.duracion + ' min · ' + Math.round(h.volumen || 0) + ' kg</div>' +
-                    '</div>' +
-                    (h.fatiga ? '<div style="background:rgba(255,0,110,0.15); color:var(--magenta); padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800; flex-shrink:0;">' + h.fatiga + '/10</div>' : '') +
-                    (tieneDetalle ? '<div class="hist-chevron">▼</div>' : '') +
+                }
+            });
+        }
+        if (h.nota) detalleHTML += '<div style="margin-top:6px;padding:6px 8px;background:rgba(255,255,255,0.04);border-radius:6px;font-size:11px;color:var(--text-gray);font-style:italic;">📝 ' + escapeHTML(h.nota) + '</div>';
+        const tieneDetalle = detalleHTML.length > 0;
+        return '<div class="hist-item" data-idx="' + i + '"' + (tieneDetalle ? ' onclick="toggleHistItem(' + i + ')"' : '') + '>' +
+            '<div class="hist-item-header">' +
+                '<div style="font-size:24px;">' + (h.rutinaEmoji || '💪') + '</div>' +
+                '<div style="flex:1;">' +
+                    '<div style="font-weight:700; font-size:13px;">' + escapeHTML(h.rutinaNombre) + '</div>' +
+                    '<div style="font-size:11px; color:var(--text-gray);">' + tiempoRelativo(h.fecha) + ' · ' + h.duracion + ' min · ' + Math.round(h.volumen || 0) + ' kg</div>' +
                 '</div>' +
-                (tieneDetalle ? '<div class="hist-detalle">' + detalleHTML + '</div>' : '') +
-            '</div>';
-        }).join('');
-    }
+                (h.fatiga ? '<div style="background:rgba(255,0,110,0.15); color:var(--magenta); padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800; flex-shrink:0;">' + h.fatiga + '/10</div>' : '') +
+                (tieneDetalle ? '<div class="hist-chevron">▼</div>' : '') +
+            '</div>' +
+            (tieneDetalle ? '<div class="hist-detalle">' + detalleHTML + '</div>' : '') +
+        '</div>';
+    }).join('');
+
+    const hayMas = todos.length > limit;
+    histContainer.innerHTML = items +
+        (hayMas
+            ? '<button class="btn btn-ghost" onclick="verMasHistorial()" style="margin-top:8px;font-size:12px;">Ver más (' + (todos.length - limit) + ' sesiones más)</button>'
+            : (todos.length > 5 ? '<button class="btn btn-ghost" onclick="verMenosHistorial()" style="margin-top:8px;font-size:12px;">Ver menos</button>' : '')
+        );
 }
 
 // ============ COACH ============
@@ -4489,6 +4593,163 @@ function cambiarPantalla(p, btn) {
     btn.classList.add('active');
     actualizarUI();
     window.scrollTo(0, 0);
+}
+
+// ============ CALENTAMIENTO + PR ALERT ============
+function toggleCalentamiento() {
+    esCalentamiento = !esCalentamiento;
+    const btn = document.getElementById('wu-btn');
+    if (btn) btn.classList.toggle('activo', esCalentamiento);
+}
+
+function checkPRAlert(val, nombreEj) {
+    const zona = document.getElementById('pr-alert-zona');
+    if (!zona || !nombreEj) return;
+    const pesoInput = parseFloat(val) || 0;
+    if (pesoInput <= 0) { zona.innerHTML = ''; return; }
+    const sesiones = state.historicoEjercicios[nombreEj] || [];
+    if (sesiones.length === 0) { zona.innerHTML = ''; return; }
+    const allPesos = sesiones.flatMap(s => (s.series || []).map(sr => sr.peso || 0)).filter(p => p > 0);
+    if (allPesos.length === 0) { zona.innerHTML = ''; return; }
+    const prActual = Math.max(...allPesos);
+    if (pesoInput > prActual) {
+        zona.innerHTML = '<div class="pr-alert-badge">🏆 ¡Posible nuevo PR! (' + prActual + ' kg → ' + pesoInput + ' kg)</div>';
+    } else {
+        zona.innerHTML = '';
+    }
+}
+
+// ============ VER MÁS / MENOS HISTORIAL ============
+function verMasHistorial() {
+    state.historialLimit = (state.historialLimit || 5) + 10;
+    renderHistorial();
+}
+function verMenosHistorial() {
+    state.historialLimit = 5;
+    renderHistorial();
+}
+
+// ============ MAPA MUSCULAR ============
+const GRUPOS_MUSCULARES = {
+    'Glúteos':    ['Glúteo mayor', 'Glúteo medio', 'Glúteo menor', 'glúteo'],
+    'Cuádriceps': ['Cuádriceps', 'cuádricep'],
+    'Isquios':    ['Isquiotibiales', 'isquio'],
+    'Espalda':    ['Dorsal ancho', 'Romboides', 'romboid', 'dorsal', 'Trapecio'],
+    'Pecho':      ['Pectoral', 'pectoral'],
+    'Hombros':    ['Deltoides', 'deltoid'],
+    'Bíceps':     ['Bíceps', 'bícep'],
+    'Tríceps':    ['Tríceps', 'trícep'],
+    'Core':       ['Core', 'abdomen', 'Recto abdominal', 'oblicuo', 'Transverso'],
+    'Piernas':    ['Gemelos', 'Aductores', 'sóleo', 'gemelo'],
+};
+
+function renderMapaMuscular() {
+    const el = document.getElementById('mapa-muscular');
+    if (!el) return;
+    const semanaAtras = Date.now() - 7 * 86400000;
+    const hoyIni = new Date(); hoyIni.setHours(0,0,0,0);
+    const semanal = state.historial.filter(h => h.fecha >= semanaAtras);
+
+    if (semanal.length === 0) {
+        el.innerHTML = '<div style="color:var(--gray);font-size:12px;text-align:center;padding:8px;">Completa sesiones para ver qué músculos has trabajado esta semana</div>';
+        return;
+    }
+
+    const entrenados = new Set();
+    const hoy = new Set();
+    semanal.forEach(h => {
+        const rutH = state.rutinas ? state.rutinas.find(r => r.id === h.rutinaId) : null;
+        if (!rutH) return;
+        rutH.ejercicios.forEach(ej => {
+            const info = INFO_EJERCICIOS[ej.nombre];
+            if (!info) return;
+            const mus = info.musculos.toLowerCase();
+            Object.entries(GRUPOS_MUSCULARES).forEach(([grupo, palabras]) => {
+                if (palabras.some(p => mus.includes(p.toLowerCase()))) {
+                    entrenados.add(grupo);
+                    if (h.fecha >= hoyIni.getTime()) hoy.add(grupo);
+                }
+            });
+        });
+    });
+
+    const todos = Object.keys(GRUPOS_MUSCULARES);
+    el.innerHTML = '<div style="display:flex;flex-wrap:wrap;">' +
+        todos.map(g => {
+            let cls, emoji;
+            if (hoy.has(g)) { cls = 'musculo-badge musculo-hoy'; emoji = '⚡'; }
+            else if (entrenados.has(g)) { cls = 'musculo-badge musculo-activo'; emoji = '✓'; }
+            else { cls = 'musculo-badge musculo-descansando'; emoji = '💤'; }
+            return '<span class="' + cls + '">' + emoji + ' ' + g + '</span>';
+        }).join('') +
+    '</div>' +
+    '<div style="font-size:9px;color:var(--gray);margin-top:8px;display:flex;gap:10px;">' +
+        '<span>⚡ Hoy</span><span>✓ Esta semana</span><span>💤 Sin trabajar</span>' +
+    '</div>';
+}
+
+// ============ AGUA ============
+function toggleAgua() {
+    const panel = document.getElementById('agua-panel');
+    if (panel.style.display !== 'none') { panel.style.display = 'none'; return; }
+    renderAgua();
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function registrarAgua(ml) {
+    const hoyStr = new Date().toDateString();
+    if (state.aguaHoy.fecha !== hoyStr) {
+        state.aguaHoy = { fecha: hoyStr, ml: 0 };
+    }
+    state.aguaHoy.ml = Math.max(0, (state.aguaHoy.ml || 0) + ml);
+    guardarDatos();
+    renderAgua();
+    actualizarAguaSummary();
+    if (ml > 0) mostrarToast('💧 +' + ml + ' ml — Total: ' + state.aguaHoy.ml + ' ml');
+}
+
+function renderAgua() {
+    const panel = document.getElementById('agua-panel');
+    if (!panel) return;
+    const hoyStr = new Date().toDateString();
+    if (state.aguaHoy.fecha !== hoyStr) state.aguaHoy = { fecha: hoyStr, ml: 0 };
+    const meta = state.perfil.aguaMeta || 2000;
+    const actual = state.aguaHoy.ml || 0;
+    const pct = Math.min(100, Math.round(actual / meta * 100));
+    const vasos = Math.floor(actual / 250);
+    const color = pct >= 100 ? '#22c55e' : pct >= 60 ? 'var(--cyan)' : 'var(--yellow)';
+    const emoji = pct >= 100 ? '🌊' : pct >= 60 ? '💧' : '🥤';
+
+    panel.innerHTML =
+        '<div class="card reveal" style="margin-top:10px;border-left:4px solid ' + color + '">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+                '<h3 class="section-title" style="margin:0;">💧 Agua de hoy</h3>' +
+                '<span style="font-size:12px;font-weight:700;color:' + color + ';">' + emoji + ' ' + actual + ' / ' + meta + ' ml</span>' +
+            '</div>' +
+            '<div class="agua-barra-wrap"><div class="agua-barra-fill" style="width:' + pct + '%;background:' + color + ';"></div></div>' +
+            '<div style="font-size:11px;color:var(--text-gray);margin-bottom:12px;">' + vasos + ' vasos aprox. · ' + pct + '% de tu objetivo diario</div>' +
+            '<div class="agua-grid">' +
+                '<button class="agua-btn" onclick="registrarAgua(150)">☕<br><span style="font-size:10px;">150 ml</span></button>' +
+                '<button class="agua-btn" onclick="registrarAgua(250)">🥤<br><span style="font-size:10px;">250 ml</span></button>' +
+                '<button class="agua-btn" onclick="registrarAgua(330)">🧃<br><span style="font-size:10px;">330 ml</span></button>' +
+                '<button class="agua-btn" onclick="registrarAgua(500)">🍶<br><span style="font-size:10px;">500 ml</span></button>' +
+            '</div>' +
+            '<button class="btn btn-ghost" onclick="registrarAgua(-250)" style="margin-top:4px;font-size:12px;padding:8px;">− Quitar 250 ml</button>' +
+        '</div>';
+}
+
+function actualizarAguaSummary() {
+    const el = document.getElementById('agua-summary');
+    if (!el) return;
+    const hoyStr = new Date().toDateString();
+    if (!state.aguaHoy || state.aguaHoy.fecha !== hoyStr || !state.aguaHoy.ml) {
+        el.textContent = 'Toca para registrar agua';
+        return;
+    }
+    const meta = state.perfil.aguaMeta || 2000;
+    const pct = Math.min(100, Math.round(state.aguaHoy.ml / meta * 100));
+    el.textContent = state.aguaHoy.ml + ' ml · ' + pct + '% del objetivo';
 }
 
 // ============ PESO CORPORAL ============
