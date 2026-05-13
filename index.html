@@ -873,7 +873,7 @@ select.input {
     font-size: 14px; color: var(--cyan);
     margin-bottom: 6px; text-transform: uppercase; letter-spacing: 2px; font-weight: 800;
 }
-.descanso-timer {
+.descanso-timer-old {
     font-family: 'Nunito', sans-serif;
     font-size: 96px; font-weight: 900;
     background: linear-gradient(135deg, var(--cyan), var(--magenta));
@@ -1513,6 +1513,22 @@ select.input {
 .hist-ejercicio-row:last-child { border-bottom:none; }
 .hist-ejercicio-nombre { font-weight:700; color:#e0e0ff; }
 .hist-ejercicio-series { font-size:10px; color:var(--cyan); font-weight:700; }
+/* === DESCANSO RING === */
+.descanso-ring-wrap { position:relative; width:160px; height:160px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; }
+.descanso-ring-svg { position:absolute; top:0; left:0; transform:rotate(-90deg); }
+.descanso-ring { transition:stroke-dashoffset 1s linear; }
+.descanso-ring-inner { position:absolute; display:flex; flex-direction:column; align-items:center; gap:2px; }
+.descanso-timer { font-family:'Nunito',sans-serif; font-size:52px; font-weight:900; line-height:1; color:white; filter:drop-shadow(0 0 16px rgba(0,240,255,0.4)); }
+.descanso-seg-label { font-size:10px; color:var(--text-gray); text-transform:uppercase; letter-spacing:1.5px; font-weight:700; }
+/* === CALENDARIO MENSUAL === */
+.cal-dia { text-align:center; aspect-ratio:1; border-radius:8px; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.2); }
+.cal-dia.entreno { background:rgba(0,240,255,0.18); color:var(--cyan); }
+.cal-dia.hoy { border:1.5px solid var(--cyan); color:var(--cyan); }
+.cal-dia.hoy.entreno { background:var(--magenta); border:none; color:white; box-shadow:0 0 8px rgba(255,0,110,0.5); }
+/* === PESO CORPORAL SPARKLINE === */
+.peso-sparkline-wrap { margin-bottom:8px; }
+/* === DISCOS MODAL === */
+.disco-badge { background:linear-gradient(135deg,rgba(0,240,255,0.1),rgba(255,0,110,0.1)); border:1px solid rgba(0,240,255,0.2); border-radius:10px; padding:8px 14px; text-align:center; }
 </style>
 </head>
 <body>
@@ -1699,6 +1715,14 @@ select.input {
             <div style="display: flex; gap: 6px; margin-top: 6px;" id="dias-labels"></div>
         </div>
 
+        <div class="card" style="padding:14px 16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <div style="font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:1px;font-weight:800;">📅 Este mes</div>
+                <div id="cal-mes-label" style="font-size:11px;font-weight:700;color:var(--text-gray);"></div>
+            </div>
+            <div id="calendario-mes" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;"></div>
+        </div>
+
         <h2 class="section-title">⭐ Récords personales</h2>
         <div id="prs-container"></div>
 
@@ -1874,6 +1898,18 @@ select.input {
                 </div>
             </div>
             <button class="btn btn-secondary" onclick="abrirModalDatos()" style="font-size:12px; padding:10px;">✏️ Editar mis datos</button>
+        </div>
+
+        <!-- PESO CORPORAL -->
+        <div class="card">
+            <h3 class="section-title" style="margin-top:0;">⚖️ Historial de peso</h3>
+            <div class="peso-sparkline-wrap" id="peso-corporal-chart">
+                <div style="text-align:center;color:var(--gray);font-size:12px;padding:10px;">Registra tu peso para ver la evolución</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+                <input type="number" class="input" id="input-nuevo-peso" placeholder="Kg de hoy" style="flex:1;font-size:14px;" inputmode="decimal" min="30" max="300">
+                <button class="btn btn-cyan" onclick="registrarPesoCorporal()" style="width:auto;padding:12px 18px;font-size:13px;white-space:nowrap;">+ Guardar</button>
+            </div>
         </div>
 
         <!-- LOGROS -->
@@ -2367,8 +2403,8 @@ let state = {
     totalEntrenamientos: 0, totalVolumen: 0, totalTiempo: 0,
     historial: [], logrosDesbloqueados: [],
     rutinas: [],
-    // Histórico de pesos: { 'ejercicio-nombre': [{fecha, series: [{peso, reps}]}] }
     historicoEjercicios: {},
+    pesosCorporales: [],
     perfil: { peso: 0, altura: 0, objetivo: '', diasSemana: 4 },
     nutricion: { objetivo: { calorias: 1800, proteinas: 120 }, diaActual: '', alimentos: [] },
     uid: null, emailGoogle: '',
@@ -2391,6 +2427,7 @@ function cargarDatos() {
         try {
             state = { ...state, ...JSON.parse(datos) };
             if (!state.historicoEjercicios) state.historicoEjercicios = {};
+            if (!state.pesosCorporales) state.pesosCorporales = [];
             if (!state.nutricion) state.nutricion = { objetivo: { calorias: 1800, proteinas: 120 }, diaActual: '', alimentos: [] };
             if (!state.perfil) state.perfil = { peso: 0, altura: 0, objetivo: '', diasSemana: 4 };
             if (state.tutorialVisto === undefined) state.tutorialVisto = false;
@@ -2510,6 +2547,8 @@ function renderPerfilPage() {
                 '<span class="perfil-logro-nombre">' + l.nombre + '</span></div>';
         }).join('');
     }
+
+    renderPesoCorporales();
 
     // Tira de últimas sesiones
     const strip = el('sesiones-strip');
@@ -3261,7 +3300,10 @@ function mostrarEjercicio() {
                 '<button class="btn btn-secondary" onclick="pausarEntrenamiento()">⏸️ Pausar</button>' +
                 '<button class="btn btn-secondary" onclick="saltarEjercicio()">Saltar ejercicio</button>' +
             '</div>' +
-            '<button class="btn btn-ghost" onclick="adaptarSesion()" style="margin-top:8px;">⚡ Adaptar sesión</button>' +
+            '<div class="row-2" style="margin-top:8px;">' +
+                '<button class="btn btn-ghost" onclick="adaptarSesion()">⚡ Adaptar sesión</button>' +
+                '<button class="btn btn-ghost" onclick="abrirCalculadoraDiscos()">🏋️ Discos</button>' +
+            '</div>' +
         '</div>';
 }
 
@@ -3411,35 +3453,65 @@ function saltarEjercicio() {
 
 function mostrarDescanso(segundos, proximoNombre, esMismoEjercicio) {
     if (segundos === 0 || !segundos) { mostrarEjercicio(); return; }
+    const total = segundos;
     let restante = segundos;
-    
+    const CIRC = 2 * Math.PI * 54; // r=54 → ~339.3
+
+    function buildRingHTML(r) {
+        const offset = CIRC * (1 - r / total);
+        return '<svg class="descanso-ring-svg" width="160" height="160" viewBox="0 0 160 160">' +
+            '<defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="0">' +
+            '<stop offset="0%" stop-color="#00f0ff"/><stop offset="100%" stop-color="#ff006e"/></linearGradient></defs>' +
+            '<circle cx="80" cy="80" r="54" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="8"/>' +
+            '<circle class="descanso-ring" cx="80" cy="80" r="54" fill="none" stroke="url(#ringGrad)" stroke-width="8" stroke-linecap="round"' +
+            ' stroke-dasharray="' + CIRC.toFixed(1) + '" stroke-dashoffset="' + offset.toFixed(1) + '"/>' +
+            '</svg>';
+    }
+
     function actualizar() {
-        const fraseDes = restante === segundos ? fraseAleatoria(FRASES_DESCANSO) : '';
-        document.getElementById('entrenando-content').innerHTML = 
+        const fraseDes = fraseAleatoria(FRASES_DESCANSO);
+        document.getElementById('entrenando-content').innerHTML =
             '<div class="descanso">' +
                 '<div class="descanso-titulo">' + (esMismoEjercicio ? 'Descansa entre series' : 'Cambio de ejercicio') + '</div>' +
-                '<div class="descanso-timer">' + restante + '</div>' +
-                (fraseDes ? '<div style="color:var(--cyan); font-size:13px; font-style:italic; margin-top:8px;">"' + fraseDes + '"</div>' : '') +
+                '<div class="descanso-ring-wrap">' +
+                    buildRingHTML(restante) +
+                    '<div class="descanso-ring-inner">' +
+                        '<div class="descanso-timer">' + restante + '</div>' +
+                        '<div class="descanso-seg-label">seg</div>' +
+                    '</div>' +
+                '</div>' +
+                (fraseDes ? '<div style="color:var(--cyan);font-size:13px;font-style:italic;margin-bottom:10px;text-align:center;">"' + fraseDes + '"</div>' : '') +
                 '<div class="descanso-proximo">' + (esMismoEjercicio ? 'Siguiente serie de:' : 'Próximo:') + ' <strong>' + proximoNombre + '</strong></div>' +
-                '<div style="margin-top:24px; display:grid; gap:8px;">' +
+                '<div style="margin-top:20px;display:grid;gap:8px;">' +
                     '<button class="btn btn-cyan" onclick="saltarDescanso()">Continuar ahora</button>' +
                     '<button class="btn btn-secondary" onclick="anadirDescanso(15)">+15 segundos</button>' +
                 '</div>' +
             '</div>';
     }
-    
+
     entrenamientoActual.descansoRestante = restante;
+    entrenamientoActual.descansoTotal = total;
     actualizar();
     timerInterval = setInterval(() => {
         restante--;
         entrenamientoActual.descansoRestante = restante;
         if (restante <= 0) {
             clearInterval(timerInterval);
+            if (navigator.vibrate) navigator.vibrate([80, 60, 80, 60, 160]);
+            TacticalAudio.confirm();
             mostrarEjercicio();
         } else {
-            // Solo actualizar el número, no todo el HTML, para no perder estado
             const timerEl = document.querySelector('.descanso-timer');
             if (timerEl) timerEl.textContent = restante;
+            const ringEl = document.querySelector('.descanso-ring');
+            if (ringEl) {
+                const offset = CIRC * (1 - restante / entrenamientoActual.descansoTotal);
+                ringEl.style.strokeDashoffset = offset.toFixed(1);
+            }
+            if (restante <= 3) {
+                TacticalAudio.beep(500 + restante * 100, 'sine', 0.07, 0.12);
+                if (navigator.vibrate) navigator.vibrate(40);
+            }
         }
     }, 1000);
 }
@@ -3449,6 +3521,12 @@ function anadirDescanso(seg) {
         entrenamientoActual.descansoRestante += seg;
         const timerEl = document.querySelector('.descanso-timer');
         if (timerEl) timerEl.textContent = entrenamientoActual.descansoRestante;
+        const ringEl = document.querySelector('.descanso-ring');
+        if (ringEl && entrenamientoActual.descansoTotal) {
+            const CIRC = 2 * Math.PI * 54;
+            const offset = CIRC * (1 - entrenamientoActual.descansoRestante / entrenamientoActual.descansoTotal);
+            ringEl.style.strokeDashoffset = Math.max(0, offset).toFixed(1);
+        }
         mostrarToast('+' + seg + 's');
     }
 }
@@ -3962,6 +4040,7 @@ function renderProgreso() {
     if (elAR) elAR.textContent = state.mejorRacha || 0;
 
     renderGrafica();
+    renderCalendario();
     renderPRs();
 
     // Historial reciente expandible
@@ -4412,6 +4491,163 @@ function cambiarPantalla(p, btn) {
     window.scrollTo(0, 0);
 }
 
+// ============ PESO CORPORAL ============
+function registrarPesoCorporal() {
+    const val = parseFloat(document.getElementById('input-nuevo-peso')?.value);
+    if (!val || val < 30 || val > 300) { mostrarToast('Peso no válido, mor'); return; }
+    if (!state.pesosCorporales) state.pesosCorporales = [];
+    const hoyStr = new Date().toDateString();
+    state.pesosCorporales = state.pesosCorporales.filter(p => new Date(p.fecha).toDateString() !== hoyStr);
+    state.pesosCorporales.push({ fecha: Date.now(), peso: val });
+    state.pesosCorporales = state.pesosCorporales.slice(-90);
+    state.perfil.peso = val;
+    guardarDatos();
+    renderPesoCorporales();
+    const input = document.getElementById('input-nuevo-peso');
+    if (input) input.value = '';
+    mostrarToast('✅ ' + val + ' kg registrado');
+}
+
+function renderPesoCorporales() {
+    const el = document.getElementById('peso-corporal-chart');
+    if (!el) return;
+    const datos = (state.pesosCorporales || []).slice(-14);
+    if (datos.length < 2) {
+        el.innerHTML = '<div style="text-align:center;color:var(--gray);font-size:12px;padding:12px;">Registra al menos 2 días para ver la evolución</div>';
+        return;
+    }
+    const valores = datos.map(d => d.peso);
+    const minV = Math.min(...valores) - 0.5;
+    const maxV = Math.max(...valores) + 0.5;
+    const W = 280, H = 64;
+    const pts = valores.map((v, i) => {
+        const x = (i / (valores.length - 1)) * W;
+        const y = H - ((v - minV) / (maxV - minV)) * H;
+        return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    const primero = valores[0];
+    const ultimo = valores[valores.length - 1];
+    const diff = Math.round((ultimo - primero) * 10) / 10;
+    const diffColor = diff <= 0 ? '#22c55e' : 'var(--magenta)';
+    const diffTxt = diff === 0 ? 'sin cambios' : (diff > 0 ? '+' : '') + diff + ' kg';
+    const circles = datos.map((d, i) => {
+        const x = (i / (valores.length - 1)) * W;
+        const y = H - ((d.peso - minV) / (maxV - minV)) * H;
+        const isLast = i === valores.length - 1;
+        return '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + (isLast ? 4 : 2.5) + '" fill="' + (isLast ? 'var(--magenta)' : 'var(--cyan)') + '"/>';
+    }).join('');
+    el.innerHTML =
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">' +
+            '<span style="font-size:28px;font-weight:900;">' + ultimo + '<span style="font-size:12px;color:var(--text-gray);font-weight:600;"> kg</span></span>' +
+            '<span style="font-size:11px;font-weight:800;color:' + diffColor + ';">' + diffTxt + ' (últimos ' + datos.length + 'd)</span>' +
+        '</div>' +
+        '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" height="' + H + '" preserveAspectRatio="none" style="overflow:visible;">' +
+            '<defs><linearGradient id="sparkGrad" x1="0" y1="0" x2="1" y2="0">' +
+            '<stop offset="0%" stop-color="var(--cyan)"/><stop offset="100%" stop-color="var(--magenta)"/></linearGradient></defs>' +
+            '<polyline points="' + pts + '" fill="none" stroke="url(#sparkGrad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' +
+            circles +
+        '</svg>' +
+        '<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gray);margin-top:4px;">' +
+            '<span>' + new Date(datos[0].fecha).toLocaleDateString('es', {day:'numeric', month:'short'}) + '</span>' +
+            '<span>' + new Date(datos[datos.length-1].fecha).toLocaleDateString('es', {day:'numeric', month:'short'}) + '</span>' +
+        '</div>';
+}
+
+// ============ CALENDARIO MENSUAL ============
+function renderCalendario() {
+    const el = document.getElementById('calendario-mes');
+    const label = document.getElementById('cal-mes-label');
+    if (!el) return;
+    const hoy = new Date();
+    const mes = hoy.getMonth();
+    const anio = hoy.getFullYear();
+    const nombreMes = hoy.toLocaleDateString('es', { month: 'long', year: 'numeric' });
+    if (label) label.textContent = nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1);
+
+    const primerDia = new Date(anio, mes, 1).getDay();
+    const offset = primerDia === 0 ? 6 : primerDia - 1;
+    const diasMes = new Date(anio, mes + 1, 0).getDate();
+
+    const headers = ['L','M','X','J','V','S','D'].map(d =>
+        '<div style="text-align:center;font-size:9px;color:var(--gray);font-weight:800;padding-bottom:2px;">' + d + '</div>'
+    ).join('');
+
+    let celdas = '';
+    for (let i = 0; i < offset; i++) celdas += '<div></div>';
+    for (let d = 1; d <= diasMes; d++) {
+        const fecha = new Date(anio, mes, d, 0, 0, 0, 0);
+        const ini = fecha.getTime();
+        const fin = ini + 86400000;
+        const entreno = state.historial.some(h => h.fecha >= ini && h.fecha < fin);
+        const esHoy = d === hoy.getDate();
+        let cls = 'cal-dia';
+        if (esHoy && entreno) cls += ' hoy entreno';
+        else if (esHoy) cls += ' hoy';
+        else if (entreno) cls += ' entreno';
+        celdas += '<div class="' + cls + '">' + d + '</div>';
+    }
+    el.innerHTML = headers + celdas;
+}
+
+// ============ CALCULADORA DE DISCOS ============
+function abrirCalculadoraDiscos() {
+    const pesoActual = parseFloat(document.getElementById('input-peso')?.value) || 0;
+    const input = document.getElementById('discos-objetivo');
+    if (input && pesoActual > 0) input.value = pesoActual;
+    calcularDiscos();
+    document.getElementById('modal-discos').classList.add('active');
+}
+
+function calcularDiscos() {
+    const objetivo = parseFloat(document.getElementById('discos-objetivo')?.value) || 0;
+    const barra = parseFloat(document.getElementById('discos-barra')?.value) ?? 20;
+    const el = document.getElementById('discos-resultado');
+    if (!el) return;
+    if (!objetivo) {
+        el.innerHTML = '<div style="color:var(--gray);font-size:12px;text-align:center;padding:8px;">Introduce el peso objetivo</div>';
+        return;
+    }
+    const porLado = (objetivo - barra) / 2;
+    if (porLado < 0) {
+        el.innerHTML = '<div style="color:var(--magenta);font-size:12px;text-align:center;padding:8px;">El objetivo no puede ser menor que la barra</div>';
+        return;
+    }
+    if (porLado === 0) {
+        el.innerHTML = '<div style="text-align:center;padding:10px;"><div style="font-size:24px;font-weight:900;">' + barra + ' kg</div><div style="font-size:11px;color:var(--text-gray);">Solo la barra, sin discos</div></div>';
+        return;
+    }
+    const DISCOS = [25, 20, 15, 10, 5, 2.5, 1.25];
+    let restante = Math.round(porLado * 100) / 100;
+    const usados = [];
+    DISCOS.forEach(d => {
+        while (restante >= d - 0.001) {
+            usados.push(d);
+            restante = Math.round((restante - d) * 100) / 100;
+        }
+    });
+    if (restante > 0.01) {
+        el.innerHTML = '<div style="color:var(--magenta);font-size:12px;text-align:center;padding:8px;">No exacto con discos estándar (diferencia: ' + restante.toFixed(2) + ' kg)</div>';
+        return;
+    }
+    const conteo = {};
+    usados.forEach(d => { conteo[d] = (conteo[d] || 0) + 1; });
+    const total = barra + porLado * 2;
+    el.innerHTML =
+        '<div style="text-align:center;margin-bottom:12px;padding:10px;background:rgba(0,240,255,0.06);border-radius:10px;">' +
+            '<div style="font-size:30px;font-weight:900;">' + Math.round(total * 10) / 10 + ' kg</div>' +
+            '<div style="font-size:10px;color:var(--text-gray);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Por lado: ' + porLado + ' kg</div>' +
+        '</div>' +
+        '<div style="font-size:9px;color:var(--cyan);text-transform:uppercase;letter-spacing:1px;font-weight:800;margin-bottom:8px;">Discos por cada lado</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:6px;">' +
+            Object.entries(conteo).sort((a, b) => b[0] - a[0]).map(([peso, qty]) =>
+                '<div class="disco-badge">' +
+                    '<div style="font-size:18px;font-weight:900;color:var(--cyan);">' + peso + ' kg</div>' +
+                    '<div style="font-size:9px;color:var(--text-gray);">×' + qty + '</div>' +
+                '</div>'
+            ).join('') +
+        '</div>';
+}
+
 function resetApp() {
     if (confirm('⚠️ ¿Borrar TODO?\nEsto no se puede deshacer.')) {
         localStorage.removeItem('labichota_v3');
@@ -4456,6 +4692,28 @@ window.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('dblclick', e => e.preventDefault());
 </script>
+<!-- ========== MODAL CALCULADORA DISCOS ========== -->
+<div class="modal-overlay" id="modal-discos">
+    <div class="modal">
+        <div class="modal-handle"></div>
+        <h2 style="margin-bottom:14px;font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:1px;">🏋️ Calculadora de discos</h2>
+        <div style="display:grid;gap:10px;margin-bottom:14px;">
+            <div class="input-row">
+                <div class="input-group">
+                    <label class="input-label">Peso objetivo (kg)</label>
+                    <input type="number" class="input" id="discos-objetivo" placeholder="80" min="1" inputmode="decimal" oninput="calcularDiscos()">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Barra (kg)</label>
+                    <input type="number" class="input" id="discos-barra" value="20" min="0" inputmode="decimal" oninput="calcularDiscos()">
+                </div>
+            </div>
+        </div>
+        <div id="discos-resultado" style="min-height:60px;"></div>
+        <button class="btn btn-ghost" onclick="document.getElementById('modal-discos').classList.remove('active')" style="margin-top:14px;">Cerrar</button>
+    </div>
+</div>
+
 <!-- ========== BIENVENIDA ========== -->
 <div id="pantalla-bienvenida">
     <div class="bv-bg"></div>
