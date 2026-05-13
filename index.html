@@ -590,6 +590,11 @@ select.input {
     padding: env(safe-area-inset-top) 14px env(safe-area-inset-bottom);
 }
 .entrenando.active { display: flex; }
+#entrenando-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
 .entrenando-header {
     padding: 12px 0;
     display: flex;
@@ -885,54 +890,85 @@ select.input {
 /* ============ CELEBRACIÓN ============ */
 .celebracion {
     text-align: center;
-    padding: 24px 16px;
-    flex: 1;
+    padding: 20px 16px 36px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 14px;
 }
 .celebracion-emoji {
-    font-size: 80px;
-    margin-bottom: 12px;
-    animation: bounce 1s infinite;
+    font-size: 64px;
+    margin-bottom: 4px;
+    animation: bounce 1.4s ease-in-out infinite;
 }
-@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@keyframes fadeSlideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 .celebracion-titulo {
-    font-size: 30px; font-weight: 900; margin-bottom: 6px;
+    font-size: 28px; font-weight: 900; margin-bottom: 4px;
     background: linear-gradient(135deg, var(--cyan), var(--magenta));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 .celebracion-frase {
-    color: #e0e0ff; margin-bottom: 16px; font-size: 14px;
-    font-style: italic;
+    color: var(--text-gray); font-size: 13px;
+    font-style: italic; line-height: 1.5;
 }
-.celebracion-stats {
+
+/* Stats grid 2x2 */
+.celebracion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.celebracion-card {
     background: var(--dark-2);
+    border: 1px solid rgba(0,240,255,0.14);
     border-radius: 14px;
-    padding: 16px;
-    margin: 14px 0;
-    text-align: left;
-    border: 1px solid rgba(0, 240, 255, 0.15);
+    padding: 14px 10px;
+    text-align: center;
 }
-.celebracion-row {
+.celebracion-card-xp  { border-color: rgba(255,0,110,0.25); }
+.celebracion-card-racha { border-color: rgba(255,190,0,0.25); }
+.celebracion-card-value {
+    font-size: 18px; font-weight: 900; color: var(--cyan);
+    margin-bottom: 4px;
+}
+.celebracion-card-label {
+    font-size: 9px; color: var(--text-gray);
+    text-transform: uppercase; letter-spacing: 1.2px; font-weight: 800;
+}
+
+/* XP progress bar */
+.fin-xp-wrap {
+    background: var(--dark-2);
+    border: 1px solid rgba(255,0,110,0.2);
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+.fin-xp-header {
     display: flex; justify-content: space-between;
-    padding: 7px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 10px; color: var(--text-gray);
+    text-transform: uppercase; letter-spacing: 1px;
+    font-weight: 800; margin-bottom: 10px;
 }
-.celebracion-row:last-child { border-bottom: none; }
-.celebracion-label { color: var(--text-gray); }
-.celebracion-valor { font-weight: 800; }
+.fin-xp-bar {
+    height: 10px; background: rgba(255,255,255,0.06);
+    border-radius: 10px; overflow: hidden;
+}
+.fin-xp-fill {
+    height: 100%; border-radius: 10px;
+    background: linear-gradient(90deg, var(--magenta), var(--purple));
+    transition: width 1.2s cubic-bezier(0.23,1,0.32,1);
+    box-shadow: 0 0 10px rgba(255,0,110,0.4);
+}
 
 .celebracion-bonus {
     background: linear-gradient(135deg, var(--magenta), var(--purple));
-    padding: 14px;
-    border-radius: 14px;
-    margin-bottom: 14px;
-    box-shadow: 0 0 24px rgba(255, 0, 110, 0.3);
+    padding: 16px; border-radius: 16px;
+    box-shadow: 0 0 30px rgba(255,0,110,0.25);
+    text-align: center;
 }
-.celebracion-bonus-titulo { font-weight: 800; font-size: 16px; }
+.celebracion-bonus-titulo { font-weight: 900; font-size: 17px; margin: 6px 0 4px; }
 
 /* ============ NAVEGACIÓN ============ */
 .nav-bottom {
@@ -1407,26 +1443,34 @@ select.input {
 .fatiga-escala {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-    margin-top: 12px;
-    margin-bottom: 14px;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 .fatiga-btn {
     background: var(--dark-2);
-    border: 2px solid var(--dark-3);
+    border: 2px solid rgba(255,255,255,0.06);
     color: white;
-    padding: 14px 4px;
-    border-radius: 10px;
+    padding: 14px 4px 12px;
+    border-radius: 14px;
     cursor: pointer;
-    font-size: 12px;
     font-weight: 700;
-    transition: all 0.15s;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    -webkit-tap-highlight-color: transparent;
 }
+.fatiga-btn:active { transform: scale(0.93); }
 .fatiga-btn.selected {
     border-color: var(--cyan);
-    background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(255, 0, 110, 0.15));
+    background: linear-gradient(160deg, rgba(0,240,255,0.14), rgba(255,0,110,0.09));
+    box-shadow: 0 0 18px rgba(0,240,255,0.2);
+    transform: translateY(-3px);
 }
-.fatiga-btn-num { font-size: 20px; font-weight: 900; display: block; margin-bottom: 2px; }
+.fatiga-btn-emoji { font-size: 24px; line-height: 1; }
+.fatiga-btn-num { font-size: 17px; font-weight: 900; color: var(--cyan); display: block; }
+.fatiga-btn-label { font-size: 9px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 /* ============ BIENVENIDA ============ */
 #pantalla-bienvenida { display:none; position:fixed; inset:0; z-index:950; overflow-y:auto; }
 .bv-bg { position:fixed; inset:0; background-image:url('assets/backgrounds/bg-onboarding.jpg'); background-size:cover; background-position:center; opacity:0.25; pointer-events:none; }
@@ -1445,7 +1489,31 @@ select.input {
 .bv-item-icon { font-size:20px; flex-shrink:0; margin-top:1px; }
 .bv-item-titulo { font-size:13px; font-weight:800; margin-bottom:2px; }
 .bv-item-desc { font-size:11px; color:var(--text-gray); line-height:1.45; }
-.bv-btn { width:100%; background:linear-gradient(135deg, var(--cyan), var(--magenta)); color:#0a0a0a; font-size:16px; font-weight:900; letter-spacing:2px; padding:16px; border-radius:16px; border:none; cursor:pointer; text-transform:uppercase; box-shadow:0 0 20px rgba(0,240,255,0.3); }</style>
+.bv-btn { width:100%; background:linear-gradient(135deg, var(--cyan), var(--magenta)); color:#0a0a0a; font-size:16px; font-weight:900; letter-spacing:2px; padding:16px; border-radius:16px; border:none; cursor:pointer; text-transform:uppercase; box-shadow:0 0 20px rgba(0,240,255,0.3); }
+/* === RACHA SEMANAL (bolitas) === */
+.racha-dia { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.racha-dia-label { font-size:9px; font-weight:800; text-transform:uppercase; color:var(--gray); }
+.racha-dia-bolita { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.1); transition:background 0.3s ease; }
+.racha-dia-bolita.activa { background:linear-gradient(135deg, var(--cyan), var(--magenta)); border-color:transparent; box-shadow:0 0 6px rgba(0,240,255,0.5); }
+.racha-dia-bolita.hoy-activa { background:var(--magenta); border-color:transparent; box-shadow:0 0 8px rgba(255,0,110,0.6); }
+/* === PR BARRA DE PROGRESO === */
+.pr-progress-wrap { margin-top:6px; background:rgba(255,255,255,0.06); border-radius:6px; height:5px; overflow:hidden; width:100%; }
+.pr-progress-fill { height:100%; border-radius:6px; background:linear-gradient(to right, var(--cyan), var(--magenta)); box-shadow:0 0 6px rgba(0,240,255,0.4); transition:width 0.6s cubic-bezier(0.17,0.67,0.83,0.67); }
+.pr-progress-label { font-size:9px; color:var(--text-gray); margin-top:3px; display:flex; justify-content:space-between; }
+/* === HISTORIAL EXPANDIBLE === */
+.hist-item { background:var(--dark-2); border-radius:10px; margin-bottom:6px; overflow:hidden; transition:border-color 0.2s; border:1px solid transparent; }
+.hist-item.expandido { border-color:rgba(0,240,255,0.2); }
+.hist-item-header { padding:12px; display:flex; align-items:center; gap:12px; cursor:pointer; user-select:none; }
+.hist-item-header:active { opacity:0.8; }
+.hist-chevron { font-size:10px; color:var(--gray); transition:transform 0.25s ease; margin-left:auto; flex-shrink:0; }
+.hist-item.expandido .hist-chevron { transform:rotate(180deg); color:var(--cyan); }
+.hist-detalle { display:none; padding:0 12px 12px; border-top:1px solid rgba(255,255,255,0.05); }
+.hist-item.expandido .hist-detalle { display:block; }
+.hist-ejercicio-row { display:flex; justify-content:space-between; align-items:baseline; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:12px; }
+.hist-ejercicio-row:last-child { border-bottom:none; }
+.hist-ejercicio-nombre { font-weight:700; color:#e0e0ff; }
+.hist-ejercicio-series { font-size:10px; color:var(--cyan); font-weight:700; }
+</style>
 </head>
 <body>
 
@@ -1577,6 +1645,10 @@ select.input {
             <h1 class="titulo-graffiti">Tu progreso</h1>
         </div>
 
+        <div class="card" id="card-hoy" style="display:none; border-left:3px solid var(--cyan);">
+            <div id="card-hoy-content"></div>
+        </div>
+
         <div class="card">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                 <div>
@@ -1592,10 +1664,11 @@ select.input {
                     <div id="delta-volumen" style="font-size:10px; margin-top:3px; font-weight:700;"></div>
                 </div>
             </div>
+            <div id="racha-semana" style="display:flex; gap:6px; margin-top:12px; align-items:center;"></div>
         </div>
 
         <div class="card" style="padding:14px 16px;">
-            <div style="font-size:10px; color:var(--magenta); text-transform:uppercase; letter-spacing:1px; font-weight:800; margin-bottom:12px;">🏆 All-time</div>
+            <div style="font-size:10px; color:var(--magenta); text-transform:uppercase; letter-spacing:1px; font-weight:800; margin-bottom:12px;">💪 De siempre</div>
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; text-align:center;">
                 <div>
                     <div style="font-size:22px; font-weight:900;" id="alltime-sesiones">0</div>
@@ -1603,7 +1676,7 @@ select.input {
                 </div>
                 <div>
                     <div style="font-size:22px; font-weight:900; color:var(--cyan);" id="alltime-toneladas">0</div>
-                    <div style="font-size:9px; color:var(--text-gray); text-transform:uppercase; letter-spacing:0.5px;">toneladas</div>
+                    <div style="font-size:9px; color:var(--text-gray); text-transform:uppercase; letter-spacing:0.5px;">kg totales</div>
                 </div>
                 <div>
                     <div style="font-size:22px; font-weight:900;" id="alltime-horas">0</div>
@@ -1620,6 +1693,7 @@ select.input {
             <div class="toggle-tabs">
                 <button class="toggle-tab active" id="tab-sesiones" onclick="cambiarModoGrafica('sesiones')">Sesiones</button>
                 <button class="toggle-tab" id="tab-volumen" onclick="cambiarModoGrafica('volumen')">Volumen kg</button>
+                <button class="toggle-tab" id="tab-semanas" onclick="cambiarModoGrafica('semanas')">4 semanas</button>
             </div>
             <div id="grafica-semanal" style="display: flex; gap: 6px; align-items: flex-end; height: 90px;"></div>
             <div style="display: flex; gap: 6px; margin-top: 6px;" id="dias-labels"></div>
@@ -3349,22 +3423,23 @@ function finalizarEntrenamiento() {
 }
 
 function mostrarFeedbackFatiga() {
-    document.getElementById('entrenando-content').innerHTML = 
+    document.getElementById('entrenando-content').innerHTML =
         '<div class="celebracion">' +
-            '<div style="font-size:60px; margin-bottom:8px;">🎯</div>' +
-            '<div class="celebracion-titulo">¿Cómo fue?</div>' +
-            '<div class="celebracion-frase">Tu respuesta ajusta tu próxima sesión</div>' +
-            '<div style="background:var(--dark-2); padding:16px; border-radius:14px;">' +
-                '<div style="font-size:11px; color:var(--cyan); text-transform:uppercase; letter-spacing:1.5px; font-weight:800; margin-bottom:6px;">Nivel de esfuerzo</div>' +
-                '<div style="font-size:13px; color:var(--text-gray); margin-bottom:4px;">1 = muy fácil · 10 = imposible</div>' +
+            '<div>' +
+                '<div style="font-size:11px;color:var(--cyan);text-transform:uppercase;letter-spacing:2px;font-weight:800;margin-bottom:8px;">✓ Sesión completada</div>' +
+                '<div class="celebracion-titulo" style="font-size:26px;">¿Cómo te fue? 💪</div>' +
+                '<div class="celebracion-frase" style="margin-bottom:0;">Tu respuesta calibra tu próxima sesión</div>' +
+            '</div>' +
+            '<div style="background:var(--dark-2);border-radius:18px;padding:20px;border:1px solid rgba(0,240,255,0.1);">' +
+                '<div style="font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:2px;font-weight:800;margin-bottom:14px;text-align:left;">Nivel de esfuerzo percibido</div>' +
                 '<div class="fatiga-escala">' +
-                    '<button class="fatiga-btn" onclick="seleccionarFatiga(2, this)"><span class="fatiga-btn-num">2</span>Fácil</button>' +
-                    '<button class="fatiga-btn" onclick="seleccionarFatiga(4, this)"><span class="fatiga-btn-num">4</span>OK</button>' +
-                    '<button class="fatiga-btn" onclick="seleccionarFatiga(6, this)"><span class="fatiga-btn-num">6</span>Dura</button>' +
-                    '<button class="fatiga-btn" onclick="seleccionarFatiga(8, this)"><span class="fatiga-btn-num">8</span>Brutal</button>' +
-                    '<button class="fatiga-btn" onclick="seleccionarFatiga(10, this)"><span class="fatiga-btn-num">10</span>Máxima</button>' +
+                    '<button class="fatiga-btn" onclick="seleccionarFatiga(2,this)"><span class="fatiga-btn-emoji">😴</span><span class="fatiga-btn-num">2</span><span class="fatiga-btn-label">Fácil</span></button>' +
+                    '<button class="fatiga-btn" onclick="seleccionarFatiga(4,this)"><span class="fatiga-btn-emoji">😊</span><span class="fatiga-btn-num">4</span><span class="fatiga-btn-label">OK</span></button>' +
+                    '<button class="fatiga-btn" onclick="seleccionarFatiga(6,this)"><span class="fatiga-btn-emoji">💪</span><span class="fatiga-btn-num">6</span><span class="fatiga-btn-label">Dura</span></button>' +
+                    '<button class="fatiga-btn" onclick="seleccionarFatiga(8,this)"><span class="fatiga-btn-emoji">🔥</span><span class="fatiga-btn-num">8</span><span class="fatiga-btn-label">Brutal</span></button>' +
+                    '<button class="fatiga-btn" onclick="seleccionarFatiga(10,this)"><span class="fatiga-btn-emoji">💀</span><span class="fatiga-btn-num">10</span><span class="fatiga-btn-label">Límite</span></button>' +
                 '</div>' +
-                '<button class="btn btn-cyan" onclick="confirmarFinalizacion()" id="btn-final-confirmar" disabled style="opacity:0.5;">CONFIRMAR Y FINALIZAR</button>' +
+                '<button class="btn btn-cyan" onclick="confirmarFinalizacion()" id="btn-final-confirmar" disabled style="opacity:0.35;width:100%;padding:15px;font-weight:900;letter-spacing:1px;font-size:14px;">CONFIRMAR Y FINALIZAR</button>' +
             '</div>' +
         '</div>';
 }
@@ -3379,64 +3454,67 @@ function seleccionarFatiga(nivel, btn) {
 }
 
 function confirmarFinalizacion() {
-    const { rutina, inicio, volumenTotal, seriesCompletadas } = entrenamientoActual;
-    const duracionMs = (Date.now() - inicio) - (entrenamientoActual.tiempoPausadoMs || 0);
-    const duracionReal = Math.max(1, Math.round(duracionMs / 60000));
-    
-    // Guardar fatiga en último histórico de cada ejercicio
-    rutina.ejercicios.forEach((ej, idx) => {
-        if (seriesCompletadas[idx] && seriesCompletadas[idx].length > 0) {
-            const hist = state.historicoEjercicios[ej.nombre];
-            if (hist && hist.length > 0) {
-                hist[hist.length - 1].fatiga = feedbackFatiga;
+    try {
+        const { rutina, inicio, volumenTotal, seriesCompletadas } = entrenamientoActual;
+        const duracionMs = (Date.now() - inicio) - (entrenamientoActual.tiempoPausadoMs || 0);
+        const duracionReal = Math.max(1, Math.round(duracionMs / 60000));
+
+        rutina.ejercicios.forEach((ej, idx) => {
+            if (seriesCompletadas[idx] && seriesCompletadas[idx].length > 0) {
+                const hist = state.historicoEjercicios[ej.nombre];
+                if (hist && hist.length > 0) {
+                    hist[hist.length - 1].fatiga = feedbackFatiga;
+                }
             }
+        });
+
+        state.xpActual += rutina.xp;
+        state.xpTotal += rutina.xp;
+        state.totalEntrenamientos++;
+        state.totalVolumen += volumenTotal;
+        state.totalTiempo += duracionReal;
+
+        const hoy = new Date().toDateString();
+        const ayer = new Date(Date.now() - 86400000).toDateString();
+        const ultimo = state.ultimoEntrenamiento ? new Date(state.ultimoEntrenamiento).toDateString() : null;
+
+        if (ultimo === ayer) state.racha++;
+        else if (ultimo !== hoy) state.racha = 1;
+
+        if (state.racha > state.mejorRacha) state.mejorRacha = state.racha;
+        state.ultimoEntrenamiento = Date.now();
+
+        state.historial.push({
+            fecha: Date.now(),
+            rutinaId: rutina.id,
+            rutinaNombre: rutina.nombre,
+            rutinaEmoji: rutina.emoji,
+            duracion: duracionReal,
+            volumen: volumenTotal,
+            xp: rutina.xp,
+            fatiga: feedbackFatiga,
+            series: seriesCompletadas
+        });
+
+        if (state.historial.length > 50) state.historial.shift();
+
+        let subioNivel = false;
+        while (state.xpActual >= state.nivel * 500) {
+            state.xpActual -= state.nivel * 500;
+            state.nivel++;
+            subioNivel = true;
         }
-    });
-    
-    state.xpActual += rutina.xp;
-    state.xpTotal += rutina.xp;
-    state.totalEntrenamientos++;
-    state.totalVolumen += volumenTotal;
-    state.totalTiempo += duracionReal;
-    
-    const hoy = new Date().toDateString();
-    const ayer = new Date(Date.now() - 86400000).toDateString();
-    const ultimo = state.ultimoEntrenamiento ? new Date(state.ultimoEntrenamiento).toDateString() : null;
-    
-    if (ultimo === ayer) state.racha++;
-    else if (ultimo !== hoy) state.racha = 1;
-    
-    if (state.racha > state.mejorRacha) state.mejorRacha = state.racha;
-    state.ultimoEntrenamiento = Date.now();
-    
-    state.historial.push({
-        fecha: Date.now(),
-        rutinaId: rutina.id,
-        rutinaNombre: rutina.nombre,
-        rutinaEmoji: rutina.emoji,
-        duracion: duracionReal,
-        volumen: volumenTotal,
-        xp: rutina.xp,
-        fatiga: feedbackFatiga,
-        series: seriesCompletadas
-    });
-    
-    // Limitar historial a últimas 50 sesiones
-    if (state.historial.length > 50) state.historial.shift();
-    
-    let subioNivel = false;
-    while (state.xpActual >= state.nivel * 500) {
-        state.xpActual -= state.nivel * 500;
-        state.nivel++;
-        subioNivel = true;
+
+        const nuevosLogros = verificarLogros();
+        const fraseRacha = FRASES_RACHA[state.racha];
+
+        try { guardarDatos(); } catch(e) { console.warn('Error guardando datos:', e); mostrarToast('⚠️ No se pudieron guardar los datos. Espacio lleno.'); }
+        mostrarCelebracion(rutina, duracionReal, volumenTotal, subioNivel, nuevosLogros, fraseRacha);
+        feedbackFatiga = null;
+    } catch(e) {
+        console.error('Error al finalizar entrenamiento:', e);
+        mostrarToast('Error al finalizar. Inténtalo de nuevo.');
     }
-    
-    const nuevosLogros = verificarLogros();
-    const fraseRacha = FRASES_RACHA[state.racha];
-    
-    guardarDatos();
-    mostrarCelebracion(rutina, duracionReal, volumenTotal, subioNivel, nuevosLogros, fraseRacha);
-    feedbackFatiga = null;
 }
 
 function verificarLogros() {
@@ -3453,28 +3531,94 @@ function verificarLogros() {
 
 function mostrarCelebracion(rutina, duracion, volumen, subioNivel, nuevosLogros, fraseRacha) {
     lanzarConfeti();
-    document.getElementById('entrenando-content').innerHTML = 
+    const xpParaNivel = state.nivel * 500;
+    const xpPct = Math.min(100, Math.round((state.xpActual / xpParaNivel) * 100));
+
+    document.getElementById('entrenando-content').innerHTML =
         '<div class="celebracion">' +
-            '<div class="celebracion-emoji">🎉</div>' +
-            '<div class="celebracion-titulo">¡LO LOGRASTE!</div>' +
-            '<div class="celebracion-frase">"' + fraseAleatoria(FRASES_FIN_ENTRENO) + '"</div>' +
-            
-            '<div class="celebracion-stats">' +
-                '<div class="celebracion-row"><span class="celebracion-label">Rutina</span><span class="celebracion-valor">' + rutina.emoji + ' ' + escapeHTML(rutina.nombre) + '</span></div>' +
-                '<div class="celebracion-row"><span class="celebracion-label">Tiempo</span><span class="celebracion-valor">' + duracion + ' min</span></div>' +
-                '<div class="celebracion-row"><span class="celebracion-label">Volumen</span><span class="celebracion-valor">' + Math.round(volumen) + ' kg</span></div>' +
-                '<div class="celebracion-row"><span class="celebracion-label">XP ganado</span><span class="celebracion-valor" style="color:var(--magenta);">+' + rutina.xp + '</span></div>' +
-                '<div class="celebracion-row"><span class="celebracion-label">Racha</span><span class="celebracion-valor">🔥 ' + state.racha + ' días</span></div>' +
+
+            // Header
+            '<div>' +
+                '<div class="celebracion-emoji">🏆</div>' +
+                '<div class="celebracion-titulo">¡LO LOGRASTE!</div>' +
+                '<div class="celebracion-frase">"' + fraseAleatoria(FRASES_FIN_ENTRENO) + '"</div>' +
             '</div>' +
-            
-            (fraseRacha ? '<div style="background:linear-gradient(135deg, var(--cyan), var(--magenta)); padding:12px; border-radius:12px; margin-bottom:12px;"><div style="font-weight:800; font-size:14px;">' + fraseRacha + '</div></div>' : '') +
-            
-            (subioNivel ? '<div class="celebracion-bonus"><div style="font-size:30px;">⬆️</div><div class="celebracion-bonus-titulo">¡SUBISTE A NIVEL ' + state.nivel + '!</div><div style="font-size:12px; opacity:0.9; text-transform:uppercase; letter-spacing:1px;">' + getTitulo(state.nivel) + '</div></div>' : '') +
-            
-            (nuevosLogros.length > 0 ? '<div style="background:rgba(0,240,255,0.1); border:1px solid rgba(0,240,255,0.3); padding:14px; border-radius:14px; margin-bottom:12px;"><div style="font-size:11px; color:var(--cyan); font-weight:800; margin-bottom:8px; text-transform:uppercase; letter-spacing:1px;">🏆 Nuevos logros</div>' + nuevosLogros.map(l => '<div style="margin:6px 0;"><span style="font-size:22px;">' + l.emoji + '</span> <strong>' + l.nombre + '</strong><div style="font-size:11px; color:var(--text-gray);">' + l.desc + '</div></div>').join('') + '</div>' : '') +
-            
-            '<button class="btn btn-cyan" onclick="volverInicio()">VOLVER AL INICIO</button>' +
+
+            // Rutina badge
+            '<div style="background:linear-gradient(135deg,rgba(0,240,255,0.07),rgba(255,0,110,0.07));border:1px solid rgba(0,240,255,0.18);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;text-align:left;">' +
+                '<span style="font-size:32px;line-height:1;">' + rutina.emoji + '</span>' +
+                '<div>' +
+                    '<div style="font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:1.5px;font-weight:800;">Rutina completada</div>' +
+                    '<div style="font-size:16px;font-weight:900;margin-top:2px;">' + escapeHTML(rutina.nombre) + '</div>' +
+                '</div>' +
+            '</div>' +
+
+            // Stats 2x2 grid
+            '<div class="celebracion-grid">' +
+                '<div class="celebracion-card">' +
+                    '<div class="celebracion-card-value">⏱ ' + duracion + ' min</div>' +
+                    '<div class="celebracion-card-label">Tiempo</div>' +
+                '</div>' +
+                '<div class="celebracion-card">' +
+                    '<div class="celebracion-card-value">🏋️ ' + Math.round(volumen) + ' kg</div>' +
+                    '<div class="celebracion-card-label">Volumen</div>' +
+                '</div>' +
+                '<div class="celebracion-card celebracion-card-xp">' +
+                    '<div class="celebracion-card-value" style="color:var(--magenta);">+' + rutina.xp + ' XP</div>' +
+                    '<div class="celebracion-card-label">Ganado</div>' +
+                '</div>' +
+                '<div class="celebracion-card celebracion-card-racha">' +
+                    '<div class="celebracion-card-value" style="color:#ffbe0b;">🔥 ' + state.racha + ' días</div>' +
+                    '<div class="celebracion-card-label">Racha</div>' +
+                '</div>' +
+            '</div>' +
+
+            // XP Progress bar
+            '<div class="fin-xp-wrap">' +
+                '<div class="fin-xp-header"><span>Nivel ' + state.nivel + '</span><span>' + state.xpActual + ' / ' + xpParaNivel + ' XP</span></div>' +
+                '<div class="fin-xp-bar"><div class="fin-xp-fill" id="fin-xp-fill" style="width:0%"></div></div>' +
+            '</div>' +
+
+            // Level up (condicional)
+            (subioNivel ?
+                '<div class="celebracion-bonus">' +
+                    '<div style="font-size:32px;">⬆️</div>' +
+                    '<div class="celebracion-bonus-titulo">¡SUBISTE A NIVEL ' + state.nivel + '!</div>' +
+                    '<div style="font-size:11px;opacity:0.9;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;">' + getTitulo(state.nivel) + '</div>' +
+                '</div>'
+            : '') +
+
+            // Frase racha (condicional)
+            (fraseRacha ?
+                '<div style="background:linear-gradient(135deg,rgba(0,240,255,0.08),rgba(255,0,110,0.08));border:1px solid rgba(0,240,255,0.2);padding:14px 16px;border-radius:14px;font-size:13px;font-weight:700;">' +
+                    fraseRacha +
+                '</div>'
+            : '') +
+
+            // Logros (condicional)
+            (nuevosLogros.length > 0 ?
+                '<div style="background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.2);padding:14px;border-radius:14px;">' +
+                    '<div style="font-size:10px;color:var(--cyan);font-weight:800;margin-bottom:10px;text-transform:uppercase;letter-spacing:1.5px;">🏆 Nuevos logros desbloqueados</div>' +
+                    nuevosLogros.map(l =>
+                        '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(0,240,255,0.05);border-radius:10px;margin-bottom:6px;">' +
+                            '<span style="font-size:28px;flex-shrink:0;">' + l.emoji + '</span>' +
+                            '<div style="text-align:left;"><div style="font-weight:800;font-size:14px;">' + l.nombre + '</div>' +
+                            '<div style="font-size:11px;color:var(--text-gray);margin-top:2px;">' + l.desc + '</div></div>' +
+                        '</div>'
+                    ).join('') +
+                '</div>'
+            : '') +
+
+            // Botón volver
+            '<button class="btn btn-cyan" onclick="volverInicio()" style="width:100%;padding:16px;font-size:15px;font-weight:900;letter-spacing:1.5px;">VOLVER AL INICIO</button>' +
+
         '</div>';
+
+    // Animar barra XP con delay para que se vea la transición
+    setTimeout(() => {
+        const bar = document.getElementById('fin-xp-fill');
+        if (bar) bar.style.width = xpPct + '%';
+    }, 500);
 }
 
 function volverInicio() {
@@ -3510,11 +3654,35 @@ function cambiarModoGrafica(modo) {
     graficaMode = modo;
     document.getElementById('tab-sesiones').classList.toggle('active', modo === 'sesiones');
     document.getElementById('tab-volumen').classList.toggle('active', modo === 'volumen');
+    document.getElementById('tab-semanas').classList.toggle('active', modo === 'semanas');
     renderGrafica();
 }
 
 function renderGrafica() {
     const ahora = Date.now();
+
+    if (graficaMode === 'semanas') {
+        const datos4 = [0,0,0,0];
+        const labs4 = ['Sem -3','Sem -2','Sem -1','Esta'];
+        for (let s = 0; s < 4; s++) {
+            const fin = ahora - s * 7 * 86400000;
+            const ini = fin - 7 * 86400000;
+            datos4[3 - s] = state.historial.filter(h => h.fecha >= ini && h.fecha < fin).length;
+        }
+        const max4 = Math.max(...datos4, 1);
+        document.getElementById('grafica-semanal').innerHTML = datos4.map(v =>
+            '<div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center;">' +
+                '<div style="width:100%; background:linear-gradient(to top, var(--cyan), var(--magenta)); border-radius:6px 6px 0 0; height:' + ((v/max4)*100) + '%; min-height:4px; position:relative; box-shadow:0 0 8px rgba(0,240,255,0.3);">' +
+                    (v > 0 ? '<div style="position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:9px; font-weight:800;">' + v + '</div>' : '') +
+                '</div>' +
+            '</div>'
+        ).join('');
+        document.getElementById('dias-labels').innerHTML = labs4.map((lab, i) =>
+            '<div style="flex:1; text-align:center; font-size:9px; color:' + (i === 3 ? 'var(--cyan)' : 'var(--gray)') + '; font-weight:' + (i === 3 ? '800' : '600') + ';">' + lab + '</div>'
+        ).join('');
+        return;
+    }
+
     const datos = [0,0,0,0,0,0,0];
     for (let i = 6; i >= 0; i--) {
         const fecha = new Date(ahora - i * 86400000);
@@ -3550,10 +3718,12 @@ function renderPRs() {
     const prs = [];
     Object.entries(state.historicoEjercicios).forEach(([nombre, sesiones]) => {
         const allSeries = sesiones.flatMap(s => s.series || []);
-        const maxPeso = Math.max(...allSeries.map(s => s.peso || 0));
-        if (maxPeso <= 0) return;
+        const pesos = allSeries.map(s => s.peso || 0).filter(p => p > 0);
+        if (pesos.length === 0) return;
+        const maxPeso = Math.max(...pesos);
+        const firstPeso = pesos[0];
         const sesionPR = sesiones.find(s => s.series.some(sr => sr.peso === maxPeso));
-        prs.push({ nombre, maxPeso, fecha: sesionPR ? sesionPR.fecha : null });
+        prs.push({ nombre, maxPeso, firstPeso, fecha: sesionPR ? sesionPR.fecha : null });
     });
     prs.sort((a, b) => b.maxPeso - a.maxPeso);
 
@@ -3561,16 +3731,22 @@ function renderPRs() {
         container.innerHTML = '<div style="text-align:center; color:var(--gray); padding:16px; font-size:13px;">Completa entrenamientos para ver tus récords personales.</div>';
         return;
     }
-    container.innerHTML = prs.slice(0, 8).map((pr, i) =>
-        '<div class="pr-item reveal" style="animation-delay:' + (i*0.1) + 's; cursor:pointer;" onclick="verProgresoEjercicio(\'' + pr.nombre.replace(/'/g, "\\'") + '\')">' +
+    container.innerHTML = prs.slice(0, 8).map((pr, i) => {
+        const mostrarBarra = pr.maxPeso > pr.firstPeso;
+        const pct = mostrarBarra ? Math.round((pr.firstPeso / pr.maxPeso) * 100) : 100;
+        return '<div class="pr-item reveal" style="animation-delay:' + (i*0.1) + 's; cursor:pointer;" onclick="verProgresoEjercicio(\'' + pr.nombre.replace(/'/g, "\\'") + '\')">' +
             '<div class="pr-rank">' + (i + 1) + '</div>' +
             '<div class="pr-info">' +
                 '<div class="pr-nombre">' + escapeHTML(pr.nombre) + '</div>' +
                 '<div class="pr-detalle">' + (pr.fecha ? tiempoRelativo(pr.fecha) : '') + ' · toca para ver evolución</div>' +
+                (mostrarBarra
+                    ? '<div class="pr-progress-wrap"><div class="pr-progress-fill" style="width:' + pct + '%"></div></div>' +
+                      '<div class="pr-progress-label"><span>' + pr.firstPeso + ' kg</span><span>' + pr.maxPeso + ' kg ▲</span></div>'
+                    : '') +
             '</div>' +
             '<div class="pr-valor">' + pr.maxPeso + ' kg</div>' +
-        '</div>'
-    ).join('');
+        '</div>';
+    }).join('');
 }
 
 function verProgresoEjercicio(nombre) {
@@ -3622,6 +3798,11 @@ function verProgresoEjercicio(nombre) {
     document.getElementById('modal-rutina').classList.add('active');
 }
 
+function toggleHistItem(idx) {
+    const el = document.querySelector('.hist-item[data-idx="' + idx + '"]');
+    if (el) el.classList.toggle('expandido');
+}
+
 function renderProgreso() {
     const ahora = Date.now();
     const semanaAtras = ahora - 7 * 86400000;
@@ -3629,13 +3810,33 @@ function renderProgreso() {
     const semanal = state.historial.filter(h => h.fecha >= semanaAtras);
     const semanaAnterior = state.historial.filter(h => h.fecha >= semanaAnteriorAtras && h.fecha < semanaAtras);
 
+    // Card "Entrenaste hoy"
+    const inicioDia = new Date(); inicioDia.setHours(0,0,0,0);
+    const sesionesHoy = state.historial.filter(h => h.fecha >= inicioDia.getTime());
+    const cardHoy = document.getElementById('card-hoy');
+    const cardHoyContent = document.getElementById('card-hoy-content');
+    if (sesionesHoy.length > 0 && cardHoy && cardHoyContent) {
+        const ult = sesionesHoy[sesionesHoy.length - 1];
+        cardHoy.style.display = 'block';
+        cardHoyContent.innerHTML =
+            '<div style="font-size:10px; color:var(--cyan); text-transform:uppercase; letter-spacing:1px; font-weight:800; margin-bottom:8px;">✅ Entrenaste hoy</div>' +
+            '<div style="display:flex; align-items:center; gap:12px;">' +
+                '<div style="font-size:32px;">' + (ult.rutinaEmoji || '💪') + '</div>' +
+                '<div style="flex:1;">' +
+                    '<div style="font-weight:900; font-size:15px;">' + escapeHTML(ult.rutinaNombre) + '</div>' +
+                    '<div style="font-size:11px; color:var(--text-gray); margin-top:2px;">' + ult.duracion + ' min · ' + Math.round(ult.volumen || 0) + ' kg levantados</div>' +
+                '</div>' +
+            '</div>';
+    } else if (cardHoy) {
+        cardHoy.style.display = 'none';
+    }
+
     const volActual = Math.round(semanal.reduce((s, h) => s + (h.volumen || 0), 0));
     const volAnterior = Math.round(semanaAnterior.reduce((s, h) => s + (h.volumen || 0), 0));
 
     document.getElementById('semana-entrenamientos').textContent = semanal.length;
     document.getElementById('semana-volumen').textContent = volActual;
 
-    // Comparativa semanal (B2)
     const dDs = document.getElementById('delta-sesiones');
     const dDv = document.getElementById('delta-volumen');
     if (dDs && semanaAnterior.length > 0) {
@@ -3649,35 +3850,88 @@ function renderProgreso() {
         dDv.style.color = d >= 0 ? '#22c55e' : 'var(--magenta)';
     } else if (dDv) { dDv.textContent = ''; }
 
-    // All-time stats (B1)
+    // Racha visual de 7 bolitas (lunes a domingo)
+    const rachaDias = document.getElementById('racha-semana');
+    if (rachaDias) {
+        const labels = ['L','M','X','J','V','S','D'];
+        const hoy = new Date();
+        const diaSemana = hoy.getDay();
+        const offsetLunes = diaSemana === 0 ? 6 : diaSemana - 1;
+        rachaDias.innerHTML = labels.map((lab, i) => {
+            const d = new Date(hoy);
+            d.setDate(hoy.getDate() - offsetLunes + i);
+            d.setHours(0,0,0,0);
+            const ini = d.getTime();
+            const fin = ini + 86400000;
+            const entreno = state.historial.some(h => h.fecha >= ini && h.fecha < fin);
+            const esHoy = i === offsetLunes;
+            const clase = entreno ? (esHoy ? 'hoy-activa' : 'activa') : '';
+            return '<div class="racha-dia">' +
+                '<div class="racha-dia-bolita ' + clase + '"></div>' +
+                '<div class="racha-dia-label" style="' + (esHoy ? 'color:var(--cyan);' : '') + '">' + lab + '</div>' +
+            '</div>';
+        }).join('');
+    }
+
+    // All-time stats
     const elAS = document.getElementById('alltime-sesiones');
     const elAT = document.getElementById('alltime-toneladas');
     const elAH = document.getElementById('alltime-horas');
     const elAR = document.getElementById('alltime-racha');
     if (elAS) elAS.textContent = state.totalEntrenamientos || 0;
-    if (elAT) elAT.textContent = (Math.round((state.totalVolumen || 0) / 100) / 10).toFixed(1);
+    if (elAT) elAT.textContent = Math.round(state.totalVolumen || 0);
     if (elAH) elAH.textContent = Math.floor((state.totalTiempo || 0) / 60);
     if (elAR) elAR.textContent = state.mejorRacha || 0;
 
     renderGrafica();
     renderPRs();
 
-    // Historial reciente
+    // Historial reciente expandible
     const recientes = [...state.historial].reverse().slice(0, 5);
     const histContainer = document.getElementById('historial-reciente');
     if (recientes.length === 0) {
         histContainer.innerHTML = '<div style="text-align:center; color:var(--gray); padding:20px; font-size:13px;">Aún no has entrenado. ¡Vamos a darle!</div>';
     } else {
-        histContainer.innerHTML = recientes.map(h =>
-            '<div style="background:var(--dark-2); padding:12px; border-radius:10px; margin-bottom:6px; display:flex; align-items:center; gap:12px;">' +
-                '<div style="font-size:24px;">' + (h.rutinaEmoji || '💪') + '</div>' +
-                '<div style="flex:1;">' +
-                    '<div style="font-weight:700; font-size:13px;">' + escapeHTML(h.rutinaNombre) + '</div>' +
-                    '<div style="font-size:11px; color:var(--text-gray);">' + tiempoRelativo(h.fecha) + ' · ' + h.duracion + ' min · ' + Math.round(h.volumen || 0) + ' kg</div>' +
+        histContainer.innerHTML = recientes.map((h, i) => {
+            const rutH = state.rutinas ? state.rutinas.find(r => r.id === h.rutinaId) : null;
+            let detalleHTML = '';
+            if (rutH && h.series && Array.isArray(h.series)) {
+                detalleHTML = rutH.ejercicios.map((ej, ejIdx) => {
+                    const seriesEj = h.series[ejIdx];
+                    if (!seriesEj || seriesEj.length === 0) return '';
+                    const resumen = seriesEj.map(s => s.peso + 'kg×' + s.reps).join(' / ');
+                    return '<div class="hist-ejercicio-row">' +
+                        '<span class="hist-ejercicio-nombre">' + escapeHTML(ej.nombre) + '</span>' +
+                        '<span class="hist-ejercicio-series">' + resumen + '</span>' +
+                    '</div>';
+                }).filter(Boolean).join('');
+            }
+            if (!detalleHTML) {
+                Object.entries(state.historicoEjercicios).forEach(([nombre, sesiones]) => {
+                    const match = sesiones.find(s => Math.abs(s.fecha - h.fecha) < 3600000);
+                    if (match && match.series && match.series.length > 0) {
+                        const resumen = match.series.map(s => s.peso + 'kg×' + s.reps).join(' / ');
+                        detalleHTML += '<div class="hist-ejercicio-row">' +
+                            '<span class="hist-ejercicio-nombre">' + escapeHTML(nombre) + '</span>' +
+                            '<span class="hist-ejercicio-series">' + resumen + '</span>' +
+                        '</div>';
+                    }
+                });
+            }
+            const tieneDetalle = detalleHTML.length > 0;
+            return '<div class="hist-item" data-idx="' + i + '"' + (tieneDetalle ? ' onclick="toggleHistItem(' + i + ')"' : '') + '>' +
+                '<div class="hist-item-header">' +
+                    '<div style="font-size:24px;">' + (h.rutinaEmoji || '💪') + '</div>' +
+                    '<div style="flex:1;">' +
+                        '<div style="font-weight:700; font-size:13px;">' + escapeHTML(h.rutinaNombre) + '</div>' +
+                        '<div style="font-size:11px; color:var(--text-gray);">' + tiempoRelativo(h.fecha) + ' · ' + h.duracion + ' min · ' + Math.round(h.volumen || 0) + ' kg</div>' +
+                    '</div>' +
+                    (h.fatiga ? '<div style="background:rgba(255,0,110,0.15); color:var(--magenta); padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800; flex-shrink:0;">' + h.fatiga + '/10</div>' : '') +
+                    (tieneDetalle ? '<div class="hist-chevron">▼</div>' : '') +
                 '</div>' +
-                (h.fatiga ? '<div style="background:rgba(255,0,110,0.15); color:var(--magenta); padding:4px 8px; border-radius:6px; font-size:11px; font-weight:800;">' + h.fatiga + '/10</div>' : '') +
-            '</div>'
-        ).join('');
+                (tieneDetalle ? '<div class="hist-detalle">' + detalleHTML + '</div>' : '') +
+            '</div>';
+        }).join('');
     }
 }
 
