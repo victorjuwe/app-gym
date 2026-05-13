@@ -2237,6 +2237,42 @@ const CATALOGO = {
     ]
 };
 
+// ============ INFO DETALLADA DE EJERCICIOS ============
+const INFO_EJERCICIOS = {
+    'Hip thrust con barra': { musculos: 'Glúteo mayor, isquiotibiales', pasos: ['Apoya la espalda alta en un banco a la altura de tus omóplatos', 'Coloca la barra sobre la cadera con una almohadilla', 'Pies planos en el suelo, a la anchura de caderas', 'Empuja con los talones y sube la cadera hasta que quede paralela al suelo', 'Aprieta los glúteos 2 segundos arriba, baja despacio'], error: 'No hiperextender la lumbar — el movimiento es de cadera, no de espalda' },
+    'Sentadilla en multipower': { musculos: 'Cuádriceps, glúteos, isquiotibiales', pasos: ['Barra sobre trapecios, no sobre el cuello', 'Pies ligeramente adelantados al eje de la barra, a la anchura de hombros', 'Baja con la espalda recta y las rodillas en dirección a las puntas del pie', 'Sube empujando con los talones'], error: 'No dejar que las rodillas caigan hacia dentro — apúntalas siempre hacia fuera' },
+    'Sentadilla búlgara con mancuernas': { musculos: 'Cuádriceps, glúteos, estabilizadores', pasos: ['Pie trasero sobre banco, pie delantero adelantado', 'Baja de forma vertical hasta que la rodilla trasera casi toque el suelo', 'El tronco ligeramente inclinado hacia adelante', 'Sube empujando con el talón del pie delantero'], error: 'No adelantar la rodilla delantera más allá de la punta del pie' },
+    'Peso muerto rumano con mancuernas': { musculos: 'Isquiotibiales, glúteos, lumbar', pasos: ['De pie con las mancuernas delante de los muslos', 'Empuja las caderas hacia atrás (bisagra), no flexiones las rodillas en exceso', 'Baja las mancuernas pegadas a las piernas, espalda recta', 'Siente el estiramiento en los isquios y sube volviendo a la posición inicial'], error: 'No redondear la espalda baja — si no llegas al suelo con la espalda recta, baja solo hasta la tibia' },
+    'Prensa de piernas': { musculos: 'Cuádriceps, glúteos, isquiotibiales', pasos: ['Pies a la anchura de caderas en la plataforma', 'Baja el peso controlando hasta 90°', 'Empuja sin bloquear las rodillas arriba', 'Elige la posición de pies según objetivo: altos = más glúteo, bajos = más cuádriceps'], error: 'No bloquear las rodillas al extender — deja un pequeño ángulo siempre' },
+    'Extensión de cuádriceps': { musculos: 'Cuádriceps (aislamiento)', pasos: ['Ajusta el rodillo justo encima del tobillo', 'Sube estirando la pierna completamente', 'Aprieta el cuádriceps 1 segundo arriba', 'Baja despacio (3 segundos)'], error: 'No usar impulso — el movimiento debe ser controlado en todo momento' },
+    'Curl femoral en máquina': { musculos: 'Isquiotibiales (aislamiento)', pasos: ['Tumbada boca abajo, rodillo justo sobre el talón', 'Flexiona la rodilla hacia el glúteo de forma controlada', 'Aprieta el isquio arriba 1 segundo', 'Baja lentamente'], error: 'No levantar las caderas al subir — mantén la pelvis pegada a la máquina' },
+    'Patada de glúteo en polea': { musculos: 'Glúteo mayor', pasos: ['Sujeta el cable en el tobillo', 'Apóyate en la máquina con las manos', 'Lleva el talón hacia atrás y arriba sin arquear la lumbar', 'Aprieta el glúteo arriba 1 segundo'], error: 'No arquear la lumbar para subir más — si lo haces, reduce el peso' },
+    'Abducción en máquina': { musculos: 'Glúteo medio, glúteo menor', pasos: ['Siéntate con la espalda recta o ligeramente inclinada hacia adelante', 'Abre las piernas contra la resistencia', 'Aguanta 1 segundo abierta', 'Cierra de forma controlada'], error: 'No inclinarse hacia atrás — inclinarte hacia adelante activa más el glúteo medio' },
+    'Aducción en máquina': { musculos: 'Aductores (cara interna del muslo)', pasos: ['Siéntate con la espalda recta', 'Cierra las piernas contra la resistencia de forma controlada', 'Aguanta 1 segundo cerrada', 'Abre volviendo despacio'], error: 'No usar un rango de movimiento que cause molestia en la ingle — ajusta el ángulo de apertura' },
+    'Zancadas con mancuernas': { musculos: 'Cuádriceps, glúteos, isquiotibiales', pasos: ['De pie con una mancuerna en cada mano', 'Da un paso adelante y baja hasta que la rodilla trasera casi toque el suelo', 'Ambas rodillas a 90°', 'Sube empujando con el talón delantero y junta los pies'], error: 'No dejar que la rodilla delantera supere la punta del pie — da un paso más largo' },
+    'Step-ups en banco': { musculos: 'Glúteos, cuádriceps', pasos: ['Coloca un pie completamente sobre el banco', 'Sube empujando solo con ese pie (no te impulses con el pie del suelo)', 'Sube el otro pie al banco, luego baja controlado', 'Alterna piernas o haz todas las reps con el mismo lado'], error: 'No impulsarse con la pierna trasera — todo el trabajo lo hace la pierna en el banco' },
+    'Gemelos en máquina': { musculos: 'Gastrocnemio, sóleo', pasos: ['Coloca las puntas de los pies en la plataforma', 'Baja estirando el talón completamente hacia abajo', 'Sube en punta de pie lo máximo posible', 'Aguanta 1 segundo arriba'], error: 'No hacer el movimiento rápido y rebotado — la amplitud completa es lo que genera resultados' },
+    'Sentadilla goblet': { musculos: 'Cuádriceps, glúteos, core', pasos: ['Sujeta una mancuerna vertical con ambas manos a la altura del pecho', 'Pies a la anchura de hombros, puntas ligeramente abiertas', 'Baja con el pecho alto y las rodillas abiertas', 'Sube empujando el suelo'], error: 'No dejar que el torso caiga hacia adelante — la mancuerna en el pecho te obliga a mantenerte erguida' },
+    'Buenos días con barra': { musculos: 'Isquiotibiales, lumbar, glúteos', pasos: ['Barra sobre trapecios como en sentadilla', 'Empuja las caderas hacia atrás (bisagra) con las rodillas ligeramente flexionadas', 'Baja el torso hasta casi horizontal manteniendo la espalda recta', 'Sube volviendo a la posición inicial'], error: 'No redondear la espalda — si no controlas la posición, reduce mucho el peso' },
+    'Jalón al pecho': { musculos: 'Dorsal ancho, bíceps, romboides', pasos: ['Agarra la barra más ancha que los hombros', 'Inclínate ligeramente hacia atrás', 'Tira hacia la parte superior del pecho llevando los codos hacia abajo y atrás', 'Aprieta la espalda abajo 1 segundo', 'Sube controlado estirando los lats'], error: 'No tirar con los brazos — piensa en llevar los codos hacia los bolsillos' },
+    'Remo en máquina': { musculos: 'Dorsal ancho, romboides, bíceps', pasos: ['Pecho contra el soporte, espalda recta', 'Tira de los mangos hacia ti llevando los codos hacia atrás', 'Aprieta la espalda al final del recorrido', 'Extiende controlado'], error: 'No encorvar los hombros al extender — mantén las escápulas activas en todo momento' },
+    'Remo en polea baja': { musculos: 'Dorsal ancho, romboides, bíceps', pasos: ['Siéntate con las piernas ligeramente flexionadas', 'Tira del agarre hacia el abdomen bajo', 'Codos pegados al cuerpo, espalda recta', 'Aprieta la espalda y vuelve controlado'], error: 'No redondear la espalda al estirar los brazos — mantén el pecho elevado' },
+    'Remo con mancuerna a una mano': { musculos: 'Dorsal ancho, bíceps', pasos: ['Apoya la rodilla y la mano del mismo lado en un banco', 'La mancuerna cuelga del brazo libre', 'Tira del codo hacia el techo, no hacia afuera', 'Aprieta la espalda arriba y baja despacio'], error: 'No rotar el torso para subir más peso — el movimiento es solo del brazo' },
+    'Curl de bíceps con mancuernas': { musculos: 'Bíceps braquial', pasos: ['De pie o sentada, mancuernas a los lados', 'Codos pegados al cuerpo durante todo el movimiento', 'Sube rotando ligeramente la muñeca hacia fuera', 'Baja despacio sin soltar del todo la tensión'], error: 'No balancear el cuerpo para subir — si lo haces, el peso es demasiado' },
+    'Curl martillo': { musculos: 'Bíceps, braquiorradial (antebrazo)', pasos: ['Mancuernas con agarre neutro (pulgares arriba)', 'Sube sin rotar la muñeca, como si fuera un martillo', 'Codos pegados al cuerpo', 'Baja controlado'], error: 'No dejar que los codos se muevan hacia adelante — fíjalos en su posición' },
+    'Press de banca con mancuernas': { musculos: 'Pectoral, deltoides anterior, tríceps', pasos: ['Tumbada en banco, mancuernas a los lados del pecho', 'Empuja hacia arriba y ligeramente hacia el centro', 'No choques las mancuernas arriba — deja un pequeño espacio', 'Baja hasta sentir el estiramiento del pecho'], error: 'No bajar los codos por debajo del banco — para el movimiento cuando los codos lleguen a la altura del banco' },
+    'Press inclinado con mancuernas': { musculos: 'Pectoral superior, deltoides anterior', pasos: ['Banco a 30-45°', 'Mancuernas a los lados del pecho superior', 'Empuja hacia arriba y ligeramente hacia el centro', 'Baja controlado sintiendo el pecho superior'], error: 'No poner el banco demasiado inclinado (>45°) — convierte el ejercicio en press de hombro' },
+    'Aperturas en máquina': { musculos: 'Pectoral (aislamiento)', pasos: ['Ajusta el asiento para que los mangos queden a la altura del pecho', 'Junta los mangos apretando el pecho', 'Aguanta 1 segundo en el centro', 'Abre controlado hasta sentir el estiramiento'], error: 'No usar el impulso de los hombros — el movimiento sale del pecho' },
+    'Elevaciones laterales': { musculos: 'Deltoides medio', pasos: ['De pie con mancuernas a los lados', 'Sube los brazos hasta la altura del hombro (no más)', 'Codos ligeramente flexionados, no rígidos', 'Baja controlado — 3 segundos bajando'], error: 'No subir por encima del hombro — activa más el trapecio y no el deltoides' },
+    'Press de hombro con mancuernas': { musculos: 'Deltoides, tríceps', pasos: ['Sentada, mancuernas a la altura de las orejas', 'Empuja hacia arriba sin bloquear los codos', 'Baja controlado hasta la posición inicial'], error: 'No arquear la espalda lumbar al empujar — mantén el core activado' },
+    'Extensión tríceps en polea': { musculos: 'Tríceps (aislamiento)', pasos: ['Codos pegados a los lados del cuerpo, fijos', 'Extiende los antebrazos hacia abajo', 'Aprieta el tríceps abajo 1 segundo', 'Sube controlado sin mover los codos'], error: 'No mover los codos — si lo haces, baja el peso' },
+    'Fondos en banco': { musculos: 'Tríceps, deltoides anterior, pectoral inferior', pasos: ['Manos en el borde del banco, dedos hacia adelante', 'Pies extendidos o rodillas flexionadas según dificultad', 'Baja doblando los codos hasta 90°', 'Sube empujando con las palmas'], error: 'No bajar demasiado — más allá de 90° hay riesgo en el hombro' },
+    'Plancha frontal': { musculos: 'Core completo, transverso, glúteos', pasos: ['Apoya antebrazos y puntas de pie', 'Cuerpo en línea recta de cabeza a talones', 'Activa el abdomen metiéndolo hacia dentro', 'Aprieta también los glúteos'], error: 'No dejar caer las caderas ni subirlas — el cuerpo debe ser una tabla' },
+    'Crunches': { musculos: 'Recto abdominal', pasos: ['Tumbada, rodillas flexionadas, pies en el suelo', 'Manos detrás de la cabeza sin tirar del cuello', 'Sube el torso con el abdomen, no con el cuello', 'Baja controlado sin llegar a apoyar del todo'], error: 'No tirar de la cabeza con las manos — la fuerza sale del abdomen' },
+    'Russian twists': { musculos: 'Oblicuos, core', pasos: ['Sentada con las rodillas flexionadas, pies elevados', 'Inclínate ligeramente hacia atrás', 'Rota el torso de lado a lado tocando el suelo', 'Mantén el abdomen activado'], error: 'No rotar solo los brazos — el giro debe venir del torso' },
+    'Cinta - HIIT': { musculos: 'Cardiovascular, piernas', pasos: ['Calienta 3 min a ritmo suave', 'Alterna 30 segundos a alta intensidad (8-9/10)', '60 segundos a ritmo suave de recuperación', 'Repite 8-10 veces y enfría 3 min'], error: 'No hacer HIIT más de 2-3 veces por semana — necesita más recuperación que el cardio moderado' }
+};
+
 // ============ 5 RUTINAS GYM SUGERIDAS ============
 const RUTINAS_SUGERIDAS = [
     {
@@ -2370,7 +2406,16 @@ function cargarDatos() {
     return false;
 }
 function guardarDatos() {
-    localStorage.setItem('labichota_v3', JSON.stringify(state));
+    // Limitar histórico de ejercicios a las últimas 10 sesiones para no saturar localStorage
+    Object.keys(state.historicoEjercicios).forEach(k => {
+        if (state.historicoEjercicios[k].length > 10)
+            state.historicoEjercicios[k] = state.historicoEjercicios[k].slice(-10);
+    });
+    try {
+        localStorage.setItem('labichota_v3', JSON.stringify(state));
+    } catch (e) {
+        console.warn('localStorage lleno, guardando solo en Firestore');
+    }
     guardarEnFirestore();
 }
 
@@ -2873,6 +2918,7 @@ function renderEjerciciosEditor() {
                 (i > 0 ? '<button class="btn-mini" onclick="moverEjercicio(' + i + ', -1)">↑</button>' : '') +
                 (i < editandoRutina.ejercicios.length - 1 ? '<button class="btn-mini" onclick="moverEjercicio(' + i + ', 1)">↓</button>' : '') +
                 '<button class="btn-mini" onclick="editarEjercicioRutina(' + i + ')">✏️</button>' +
+                (INFO_EJERCICIOS[e.nombre] ? '<button class="btn-mini" onclick="mostrarInfoEjercicio(\'' + e.nombre.replace(/'/g, "\\'") + '\')">ℹ️</button>' : '') +
                 '<button class="btn-mini btn-mini-danger" onclick="eliminarEjercicio(' + i + ')">🗑️</button>' +
             '</div>' +
         '</div>'
@@ -3191,7 +3237,10 @@ function mostrarEjercicio() {
     
     document.getElementById('entrenando-content').innerHTML = 
         '<div class="ejercicio-actual">' +
-            '<div class="ejercicio-titulo-mega">' + escapeHTML(ej.nombre) + '</div>' +
+            '<div class="ejercicio-titulo-mega" style="display:flex; align-items:center; justify-content:space-between;">' +
+                '<span>' + escapeHTML(ej.nombre) + '</span>' +
+                (INFO_EJERCICIOS[ej.nombre] ? '<button onclick="mostrarInfoEjercicio(\'' + ej.nombre.replace(/'/g, "\\'") + '\')" style="background:rgba(0,240,255,0.12); border:1px solid rgba(0,240,255,0.3); color:var(--cyan); border-radius:50%; width:28px; height:28px; font-size:14px; cursor:pointer; flex-shrink:0;">ℹ</button>' : '') +
+            '</div>' +
             
             historicoHTML +
             
@@ -3747,6 +3796,35 @@ function renderPRs() {
             '<div class="pr-valor">' + pr.maxPeso + ' kg</div>' +
         '</div>';
     }).join('');
+}
+
+function mostrarInfoEjercicio(nombre) {
+    const info = INFO_EJERCICIOS[nombre];
+    if (!info) return;
+    document.getElementById('modal-rutina-content').innerHTML =
+        '<div style="margin-bottom:16px;">' +
+            '<div style="font-size:11px; color:var(--cyan); text-transform:uppercase; letter-spacing:1px; font-weight:800; margin-bottom:4px;">📖 Guía de ejercicio</div>' +
+            '<h2 style="font-size:18px; font-weight:900; line-height:1.2;">' + escapeHTML(nombre) + '</h2>' +
+        '</div>' +
+        '<div style="background:rgba(0,240,255,0.06); border:1px solid rgba(0,240,255,0.2); border-radius:10px; padding:10px 12px; margin-bottom:12px;">' +
+            '<div style="font-size:9px; color:var(--cyan); text-transform:uppercase; letter-spacing:1px; font-weight:800; margin-bottom:4px;">💪 Músculos</div>' +
+            '<div style="font-size:13px; font-weight:700;">' + escapeHTML(info.musculos) + '</div>' +
+        '</div>' +
+        '<div style="margin-bottom:12px;">' +
+            '<div style="font-size:9px; color:var(--magenta); text-transform:uppercase; letter-spacing:1px; font-weight:800; margin-bottom:8px;">▶ Cómo ejecutarlo</div>' +
+            info.pasos.map((p, i) =>
+                '<div style="display:flex; gap:10px; margin-bottom:7px; align-items:flex-start;">' +
+                    '<span style="background:var(--magenta); color:white; width:18px; height:18px; border-radius:50%; font-size:10px; font-weight:900; display:flex; align-items:center; justify-content:center; flex-shrink:0;">' + (i+1) + '</span>' +
+                    '<span style="font-size:13px; line-height:1.4;">' + escapeHTML(p) + '</span>' +
+                '</div>'
+            ).join('') +
+        '</div>' +
+        '<div style="background:rgba(255,0,110,0.08); border:1px solid rgba(255,0,110,0.25); border-radius:10px; padding:10px 12px; margin-bottom:16px;">' +
+            '<div style="font-size:9px; color:var(--magenta); text-transform:uppercase; letter-spacing:1px; font-weight:800; margin-bottom:4px;">⚠️ Error más común</div>' +
+            '<div style="font-size:12px; line-height:1.4;">' + escapeHTML(info.error) + '</div>' +
+        '</div>' +
+        '<button class="btn btn-ghost" onclick="cerrarModal()">Cerrar</button>';
+    document.getElementById('modal-rutina').classList.add('active');
 }
 
 function verProgresoEjercicio(nombre) {
